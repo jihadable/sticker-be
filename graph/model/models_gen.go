@@ -15,8 +15,9 @@ type Auth struct {
 }
 
 type Cart struct {
-	ID       string `json:"id"`
-	Customer *User  `json:"customer"`
+	ID       string     `json:"id"`
+	Customer *User      `json:"customer"`
+	Products []*Product `json:"products"`
 }
 
 type CartProduct struct {
@@ -35,8 +36,9 @@ type Category struct {
 }
 
 type Conversation struct {
-	ID       string `json:"id"`
-	Customer *User  `json:"customer"`
+	ID       string     `json:"id"`
+	Customer *User      `json:"customer"`
+	Messages []*Message `json:"messages"`
 }
 
 type CustomProduct struct {
@@ -46,21 +48,23 @@ type CustomProduct struct {
 }
 
 type Message struct {
-	ID           string        `json:"id"`
-	Message      string        `json:"Message"`
-	Conversation *Conversation `json:"conversation"`
-	Product      *Product      `json:"product,omitempty"`
-	Sender       *User         `json:"sender"`
+	ID            string         `json:"id"`
+	Message       string         `json:"Message"`
+	Conversation  *Conversation  `json:"conversation"`
+	Product       *Product       `json:"product,omitempty"`
+	CustomProduct *CustomProduct `json:"custom_product,omitempty"`
+	Sender        *User          `json:"sender"`
 }
 
 type Mutation struct {
 }
 
 type Order struct {
-	ID         string `json:"id"`
-	Status     string `json:"status"`
-	TotalPrice int32  `json:"total_price"`
-	Customer   *User  `json:"customer"`
+	ID         string     `json:"id"`
+	Status     string     `json:"status"`
+	TotalPrice int32      `json:"total_price"`
+	Customer   *User      `json:"customer"`
+	Products   []*Product `json:"products"`
 }
 
 type OrderProduct struct {

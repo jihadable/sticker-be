@@ -46,13 +46,11 @@ type CustomProduct {
 
 type Category {
 	id: ID!
-	name: String!
 
 	products: [Product]!
 }
 
 type ProductCategory {
-	id: ID!
 	# product_id: String!
 	# category_id: String!
 
@@ -139,7 +137,6 @@ type Query {
 	# product
 	product: Product!
 	products: [Product]!
-	products_by_user: [Product]!
 
 	# custom_product
 	custom_product: CustomProduct!
@@ -162,9 +159,43 @@ type Query {
 
 type Mutation {
 	# user
-	register(name: String!, email: String!, password: String!, phone: String!, address: String!): Auth
-	login(email: String!, password: String!): Auth
-	update_user(phone: String!, address: String!): User
+	post_user(
+		name: String!
+		email: String!
+		password: String!
+		phone: String!
+		address: String!
+	): Auth!
+	verify_user(email: String!, password: String!): Auth!
+	update_user(phone: String!, address: String!): User!
 
-	
+	# product
+	post_product(
+		name: String!
+		price: Int!
+		stock: Int!
+		description: String!
+	): Product!
+	update_product(
+		name: String!
+		price: Int!
+		stock: Int!
+		description: String!
+	): Product!
+	delete_product(id: ID!): Boolean!
+
+	# custom_product
+	post_custom_product(): CustomProduct!
+	update_custom_product(): CustomProduct!
+	delete_custom_product(id: ID!): Boolean!
+
+	# category
+	post_category(id: ID!): Category!
+	delete_category(id: ID!): Boolean!
+
+	# order
+	update_order(): Order!
+
+	# message
+	post_message(): Message!
 }

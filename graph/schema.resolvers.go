@@ -35,6 +35,56 @@ func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
 	return &model.User{}, nil
 }
 
+// Product is the resolver for the product field.
+func (r *queryResolver) Product(ctx context.Context) (*model.Product, error) {
+	panic(fmt.Errorf("not implemented: Product - product"))
+}
+
+// Products is the resolver for the products field.
+func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) {
+	panic(fmt.Errorf("not implemented: Products - products"))
+}
+
+// CustomProduct is the resolver for the custom_product field.
+func (r *queryResolver) CustomProduct(ctx context.Context) (*model.CustomProduct, error) {
+	panic(fmt.Errorf("not implemented: CustomProduct - custom_product"))
+}
+
+// CustomProductsByUser is the resolver for the custom_products_by_user field.
+func (r *queryResolver) CustomProductsByUser(ctx context.Context) ([]*model.CustomProduct, error) {
+	panic(fmt.Errorf("not implemented: CustomProductsByUser - custom_products_by_user"))
+}
+
+// Category is the resolver for the category field.
+func (r *queryResolver) Category(ctx context.Context) (*model.Category, error) {
+	panic(fmt.Errorf("not implemented: Category - category"))
+}
+
+// Categories is the resolver for the categories field.
+func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
+	panic(fmt.Errorf("not implemented: Categories - categories"))
+}
+
+// Cart is the resolver for the cart field.
+func (r *queryResolver) Cart(ctx context.Context) (*model.Cart, error) {
+	panic(fmt.Errorf("not implemented: Cart - cart"))
+}
+
+// Order is the resolver for the order field.
+func (r *queryResolver) Order(ctx context.Context) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented: Order - order"))
+}
+
+// OrdersByUser is the resolver for the orders_by_user field.
+func (r *queryResolver) OrdersByUser(ctx context.Context) ([]*model.Order, error) {
+	panic(fmt.Errorf("not implemented: OrdersByUser - orders_by_user"))
+}
+
+// ConversationByUser is the resolver for the conversation_by_user field.
+func (r *queryResolver) ConversationByUser(ctx context.Context) (*model.Conversation, error) {
+	panic(fmt.Errorf("not implemented: ConversationByUser - conversation_by_user"))
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
