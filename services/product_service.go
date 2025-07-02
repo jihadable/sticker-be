@@ -1,7 +1,6 @@
 package services
 
 import (
-	"github.com/jihadable/sticker-be/config"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -9,6 +8,7 @@ import (
 type ProductService interface {
 	AddProduct()
 	GetProductById()
+	GetProductsByCategory()
 	GetProducts()
 	UpdateProductById()
 	DeleteProductById()
@@ -27,6 +27,10 @@ func (service *ProductServiceImpl) GetProductById() {
 
 }
 
+func (service *ProductServiceImpl) GetProductsByCategory() {
+
+}
+
 func (service *ProductServiceImpl) GetProducts() {
 
 }
@@ -39,6 +43,6 @@ func (service *ProductServiceImpl) DeleteProductById() {
 
 }
 
-func NewProductService() ProductService {
-	return &ProductServiceImpl{DB: config.DB(), Redis: config.Redis()}
+func NewProductService(db *gorm.DB, redis *redis.Client) ProductService {
+	return &ProductServiceImpl{DB: db, Redis: redis}
 }

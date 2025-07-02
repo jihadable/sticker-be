@@ -130,8 +130,9 @@ type Auth {
 	user: User!
 }
 
-type OrderItem {
-	product_id: ID!
+input OrderItem {
+	product_id: ID
+	custom_product_id: ID
 	quantity: Int!
 	size: Size!
 	subtotal_price: Int!
@@ -192,8 +193,8 @@ type Mutation {
 	delete_product(id: ID!): Boolean!
 
 	# custom_product
-	post_custom_product(): CustomProduct!
-	update_custom_product(): CustomProduct!
+	post_custom_product: CustomProduct!
+	update_custom_product: CustomProduct!
 	delete_custom_product(id: ID!): Boolean!
 
 	# category
@@ -215,7 +216,7 @@ type Mutation {
 	): CartProduct!
 
 	# order
-	post_order([OrderItem]!): Order!
+	post_order(order_items: [OrderItem]!): Order!
 	update_order(id: ID!, status: String!): Order!
 
 	# message

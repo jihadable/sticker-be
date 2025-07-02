@@ -12,19 +12,84 @@ import (
 	"github.com/jihadable/sticker-be/utils"
 )
 
-// Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
-	panic(fmt.Errorf("not implemented: Register - register"))
+// PostUser is the resolver for the post_user field.
+func (r *mutationResolver) PostUser(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
+	panic(fmt.Errorf("not implemented: PostUser - post_user"))
 }
 
-// Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Auth, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+// VerifyUser is the resolver for the verify_user field.
+func (r *mutationResolver) VerifyUser(ctx context.Context, email string, password string) (*model.Auth, error) {
+	panic(fmt.Errorf("not implemented: VerifyUser - verify_user"))
 }
 
 // UpdateUser is the resolver for the update_user field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address string) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: UpdateUser - update_user"))
+}
+
+// PostProduct is the resolver for the post_product field.
+func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string) (*model.Product, error) {
+	panic(fmt.Errorf("not implemented: PostProduct - post_product"))
+}
+
+// UpdateProduct is the resolver for the update_product field.
+func (r *mutationResolver) UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string) (*model.Product, error) {
+	panic(fmt.Errorf("not implemented: UpdateProduct - update_product"))
+}
+
+// DeleteProduct is the resolver for the delete_product field.
+func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteProduct - delete_product"))
+}
+
+// PostCustomProduct is the resolver for the post_custom_product field.
+func (r *mutationResolver) PostCustomProduct(ctx context.Context) (*model.CustomProduct, error) {
+	panic(fmt.Errorf("not implemented: PostCustomProduct - post_custom_product"))
+}
+
+// UpdateCustomProduct is the resolver for the update_custom_product field.
+func (r *mutationResolver) UpdateCustomProduct(ctx context.Context) (*model.CustomProduct, error) {
+	panic(fmt.Errorf("not implemented: UpdateCustomProduct - update_custom_product"))
+}
+
+// DeleteCustomProduct is the resolver for the delete_custom_product field.
+func (r *mutationResolver) DeleteCustomProduct(ctx context.Context, id string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteCustomProduct - delete_custom_product"))
+}
+
+// PostCategory is the resolver for the post_category field.
+func (r *mutationResolver) PostCategory(ctx context.Context, id string) (*model.Category, error) {
+	panic(fmt.Errorf("not implemented: PostCategory - post_category"))
+}
+
+// DeleteCategory is the resolver for the delete_category field.
+func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteCategory - delete_category"))
+}
+
+// PostCartProduct is the resolver for the post_cart_product field.
+func (r *mutationResolver) PostCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error) {
+	panic(fmt.Errorf("not implemented: PostCartProduct - post_cart_product"))
+}
+
+// UpdateCartProduct is the resolver for the update_cart_product field.
+func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, quantity int32, size model.Size) (*model.CartProduct, error) {
+	panic(fmt.Errorf("not implemented: UpdateCartProduct - update_cart_product"))
+}
+
+// PostOrder is the resolver for the post_order field.
+func (r *mutationResolver) PostOrder(ctx context.Context, orderItem []*model.OrderItem) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented: PostOrder - post_order"))
+}
+
+// UpdateOrder is the resolver for the update_order field.
+func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, status string) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented: UpdateOrder - update_order"))
+}
+
+// PostMessage is the resolver for the post_message field.
+func (r *mutationResolver) PostMessage(ctx context.Context, conversationID string, productID *string, customProductID *string, message string) (*model.Message, error) {
+	panic(fmt.Errorf("not implemented: PostMessage - post_message"))
 }
 
 // User is the resolver for the user field.
@@ -93,3 +158,18 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) Register(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
+	panic(fmt.Errorf("not implemented: Register - register"))
+}
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Auth, error) {
+	panic(fmt.Errorf("not implemented: Login - login"))
+}
+*/

@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jihadable/sticker-be/graph"
-	"github.com/jihadable/sticker-be/services"
 	"github.com/jihadable/sticker-be/utils"
 	"github.com/joho/godotenv"
 )
@@ -21,7 +20,6 @@ func main() {
 	}
 
 	app := fiber.New()
-	services.NewUserService()
 
 	app.All("/graphql", func(c *fiber.Ctx) error {
 		handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))

@@ -31,7 +31,6 @@ type CartProduct struct {
 
 type Category struct {
 	ID       string     `json:"id"`
-	Name     string     `json:"name"`
 	Products []*Product `json:"products"`
 }
 
@@ -49,7 +48,7 @@ type CustomProduct struct {
 
 type Message struct {
 	ID            string         `json:"id"`
-	Message       string         `json:"Message"`
+	Message       string         `json:"message"`
 	Conversation  *Conversation  `json:"conversation"`
 	Product       *Product       `json:"product,omitempty"`
 	CustomProduct *CustomProduct `json:"custom_product,omitempty"`
@@ -65,6 +64,14 @@ type Order struct {
 	TotalPrice int32      `json:"total_price"`
 	Customer   *User      `json:"customer"`
 	Products   []*Product `json:"products"`
+}
+
+type OrderItem struct {
+	ProductID       *string `json:"product_id,omitempty"`
+	CustomProductID *string `json:"custom_product_id,omitempty"`
+	Quantity        int32   `json:"quantity"`
+	Size            Size    `json:"size"`
+	SubtotalPrice   int32   `json:"subtotal_price"`
 }
 
 type OrderProduct struct {
@@ -88,7 +95,6 @@ type Product struct {
 }
 
 type ProductCategory struct {
-	ID       string    `json:"id"`
 	Product  *Product  `json:"product"`
 	Category *Category `json:"category"`
 }
