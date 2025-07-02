@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jihadable/sticker-be/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -30,6 +31,33 @@ func DB() *gorm.DB {
 	if err != nil {
 		panic("Failed to connect to database: " + err.Error())
 	}
+
+	db.Migrator().DropTable(
+		&models.User{},
+		&models.Product{},
+		&models.CustomProduct{},
+		&models.Category{},
+		&models.ProductCategory{},
+		&models.Cart{},
+		&models.CartProduct{},
+		&models.Order{},
+		&models.OrderProduct{},
+		&models.Conversation{},
+		&models.Message{},
+	)
+	db.AutoMigrate(
+		&models.User{},
+		&models.Product{},
+		&models.CustomProduct{},
+		&models.Category{},
+		&models.ProductCategory{},
+		&models.Cart{},
+		&models.CartProduct{},
+		&models.Order{},
+		&models.OrderProduct{},
+		&models.Conversation{},
+		&models.Message{},
+	)
 
 	return db
 }

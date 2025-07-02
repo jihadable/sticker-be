@@ -1,10 +1,130 @@
+enum Role {
+	customer
+	admin
+}
+
+enum Size {
+	S
+	M
+	L
+	XL
+}
+
 type User {
-	id: String!
+	id: ID!
 	name: String!
 	email: String!
-	password: String!
+	# password: String!
+	role: Role!
 	phone: Int!
 	address: String!
+
+	custom_products: [CustomProduct]!
+	cart: Cart
+	orders: [Order]!
+	conversations: [Conversation]!
+}
+
+type Product {
+	id: ID!
+	name: String!
+	price: Int!
+	stock: Int!
+	image_url: String!
+	description: String!
+
+	categories: [Category]!
+}
+
+type CustomProduct {
+	id: ID!
+	# customer_id: String!
+	image_url: String!
+
+	customer: User!
+}
+
+type Category {
+	id: ID!
+	name: String!
+
+	products: [Product]!
+}
+
+type ProductCategory {
+	id: ID!
+	# product_id: String!
+	# category_id: String!
+
+	product: Product!
+	category: Category!
+}
+
+type Cart {
+	id: ID!
+	# customer_id: String!
+
+	customer: User!
+	products: [Product]!
+}
+
+type CartProduct {
+	id: ID!
+	# cart_id: String!
+	# product_id: String
+	# custom_product_id: String
+	quantity: Int!
+	size: Size!
+
+	cart: Cart!
+	product: Product
+	custom_product: CustomProduct
+}
+
+type Order {
+	id: ID!
+	# customer_id: String!
+	status: String!
+	total_price: Int!
+
+	customer: User!
+	products: [Product]!
+}
+
+type OrderProduct {
+	id: ID!
+	# order_id: String!
+	# product_id: String
+	# custom_product_id: String
+	quantity: Int!
+	size: Size!
+	subtotal_price: Int!
+
+	order: Order!
+	product: Product
+	custom_product: CustomProduct
+}
+
+type Conversation {
+	id: ID!
+	# customer_id: String!
+
+	customer: User!
+	messages: [Message]!
+}
+
+type Message {
+	id: ID!
+	# conversation_id: String!
+	# product_id: String
+	# custom_product_id: String
+	# sender_id: String!
+	Message: String!
+
+	conversation: Conversation!
+	product: Product
+	custom_product: CustomProduct
+	sender: User!
 }
 
 type Auth {
@@ -13,11 +133,38 @@ type Auth {
 }
 
 type Query {
+	# user
 	user: User!
+
+	# product
+	product: Product!
+	products: [Product]!
+	products_by_user: [Product]!
+
+	# custom_product
+	custom_product: CustomProduct!
+	custom_products_by_user: [CustomProduct]!
+
+	# category
+	category: Category!
+	categories: [Category]!
+
+	# cart
+	cart: Cart!
+
+	# order
+	order: Order!
+	orders_by_user: [Order]!
+
+	# conversation
+	conversation_by_user: Conversation
 }
 
 type Mutation {
+	# user
 	register(name: String!, email: String!, password: String!, phone: String!, address: String!): Auth
 	login(email: String!, password: String!): Auth
 	update_user(phone: String!, address: String!): User
+
+	
 }

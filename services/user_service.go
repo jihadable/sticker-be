@@ -36,5 +36,8 @@ func (service *UserServiceImpl) VerifyUser() (*model.User, error) {
 }
 
 func NewUserService() UserService {
-	return &UserServiceImpl{DB: config.DB(), Redis: config.Redis()}
+	return &UserServiceImpl{
+		DB:    config.DB(),
+		Redis: config.Redis(),
+	}
 }

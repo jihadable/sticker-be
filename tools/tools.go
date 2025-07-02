@@ -1,7 +1,7 @@
 package tools
 
 import (
-	// _ "github.com/99designs/gqlgen"
+	_ "github.com/99designs/gqlgen"
 	_ "github.com/go-playground/validator/v10"
 	_ "github.com/gofiber/adaptor/v2"
 	_ "github.com/gofiber/fiber/v2"

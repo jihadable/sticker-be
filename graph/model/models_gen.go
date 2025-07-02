@@ -2,22 +2,219 @@
 
 package model
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Auth struct {
 	Token string `json:"token"`
 	User  *User  `json:"user"`
 }
 
+type Cart struct {
+	ID       string `json:"id"`
+	Customer *User  `json:"customer"`
+}
+
+type CartProduct struct {
+	ID            string         `json:"id"`
+	Quantity      int32          `json:"quantity"`
+	Size          Size           `json:"size"`
+	Cart          *Cart          `json:"cart"`
+	Product       *Product       `json:"product,omitempty"`
+	CustomProduct *CustomProduct `json:"custom_product,omitempty"`
+}
+
+type Category struct {
+	ID       string     `json:"id"`
+	Name     string     `json:"name"`
+	Products []*Product `json:"products"`
+}
+
+type Conversation struct {
+	ID       string `json:"id"`
+	Customer *User  `json:"customer"`
+}
+
+type CustomProduct struct {
+	ID       string `json:"id"`
+	ImageURL string `json:"image_url"`
+	Customer *User  `json:"customer"`
+}
+
+type Message struct {
+	ID           string        `json:"id"`
+	Message      string        `json:"Message"`
+	Conversation *Conversation `json:"conversation"`
+	Product      *Product      `json:"product,omitempty"`
+	Sender       *User         `json:"sender"`
+}
+
 type Mutation struct {
+}
+
+type Order struct {
+	ID         string `json:"id"`
+	Status     string `json:"status"`
+	TotalPrice int32  `json:"total_price"`
+	Customer   *User  `json:"customer"`
+}
+
+type OrderProduct struct {
+	ID            string         `json:"id"`
+	Quantity      int32          `json:"quantity"`
+	Size          Size           `json:"size"`
+	SubtotalPrice int32          `json:"subtotal_price"`
+	Order         *Order         `json:"order"`
+	Product       *Product       `json:"product,omitempty"`
+	CustomProduct *CustomProduct `json:"custom_product,omitempty"`
+}
+
+type Product struct {
+	ID          string      `json:"id"`
+	Name        string      `json:"name"`
+	Price       int32       `json:"price"`
+	Stock       int32       `json:"stock"`
+	ImageURL    string      `json:"image_url"`
+	Description string      `json:"description"`
+	Categories  []*Category `json:"categories"`
+}
+
+type ProductCategory struct {
+	ID       string    `json:"id"`
+	Product  *Product  `json:"product"`
+	Category *Category `json:"category"`
 }
 
 type Query struct {
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Phone    int32  `json:"phone"`
-	Address  string `json:"address"`
+	ID             string           `json:"id"`
+	Name           string           `json:"name"`
+	Email          string           `json:"email"`
+	Role           Role             `json:"role"`
+	Phone          int32            `json:"phone"`
+	Address        string           `json:"address"`
+	CustomProducts []*CustomProduct `json:"custom_products"`
+	Cart           *Cart            `json:"cart,omitempty"`
+	Orders         []*Order         `json:"orders"`
+	Conversations  []*Conversation  `json:"conversations"`
+}
+
+type Role string
+
+const (
+	RoleCustomer Role = "customer"
+	RoleAdmin    Role = "admin"
+)
+
+var AllRole = []Role{
+	RoleCustomer,
+	RoleAdmin,
+}
+
+func (e Role) IsValid() bool {
+	switch e {
+	case RoleCustomer, RoleAdmin:
+		return true
+	}
+	return false
+}
+
+func (e Role) String() string {
+	return string(e)
+}
+
+func (e *Role) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Role(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Role", str)
+	}
+	return nil
+}
+
+func (e Role) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *Role) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e Role) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type Size string
+
+const (
+	SizeS  Size = "S"
+	SizeM  Size = "M"
+	SizeL  Size = "L"
+	SizeXl Size = "XL"
+)
+
+var AllSize = []Size{
+	SizeS,
+	SizeM,
+	SizeL,
+	SizeXl,
+}
+
+func (e Size) IsValid() bool {
+	switch e {
+	case SizeS, SizeM, SizeL, SizeXl:
+		return true
+	}
+	return false
+}
+
+func (e Size) String() string {
+	return string(e)
+}
+
+func (e *Size) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Size(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Size", str)
+	}
+	return nil
+}
+
+func (e Size) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *Size) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e Size) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }
