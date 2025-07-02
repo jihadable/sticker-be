@@ -117,7 +117,7 @@ type Message {
 	# product_id: String
 	# custom_product_id: String
 	# sender_id: String!
-	Message: String!
+	message: String!
 
 	conversation: Conversation!
 	product: Product
@@ -128,6 +128,13 @@ type Message {
 type Auth {
 	token: String!
 	user: User!
+}
+
+type OrderItem {
+	product_id: ID!
+	quantity: Int!
+	size: Size!
+	subtotal_price: Int!
 }
 
 type Query {
@@ -193,9 +200,29 @@ type Mutation {
 	post_category(id: ID!): Category!
 	delete_category(id: ID!): Boolean!
 
+	# cart_product
+	post_cart_product(
+		cart_id: ID!
+		product_id: ID
+		custom_product_id: ID
+		quantity: Int!
+		size: Size!
+	): CartProduct!
+	update_cart_product(
+		id: ID!
+		quantity: Int!
+		size: Size!
+	): CartProduct!
+
 	# order
-	update_order(): Order!
+	post_order([OrderItem]!): Order!
+	update_order(id: ID!, status: String!): Order!
 
 	# message
-	post_message(): Message!
+	post_message(
+		conversation_id: ID!
+		product_id: ID
+		custom_product_id: ID
+		message: String!
+	): Message!
 }
