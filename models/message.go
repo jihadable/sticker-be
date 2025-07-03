@@ -6,12 +6,12 @@ import (
 )
 
 type Message struct {
-	Id              uuid.UUID `gorm:"column:id;primaryKey"`
-	ConversationId  string    `gorm:"column:conversation_id"`
-	ProductId       *string   `gorm:"column:product_id"`
-	CustomProductId *string   `gorm:"column:custom_product_id"`
-	SenderId        string    `gorm:"column:sender_id"`
-	Message         string    `gorm:"column:message"`
+	Id              string  `gorm:"column:id;primaryKey"`
+	ConversationId  string  `gorm:"column:conversation_id"`
+	ProductId       *string `gorm:"column:product_id"`
+	CustomProductId *string `gorm:"column:custom_product_id"`
+	SenderId        string  `gorm:"column:sender_id"`
+	Message         string  `gorm:"column:message"`
 
 	Conversation  *Conversation  `gorm:"foreignKey:ConversationId;references:Id"`
 	Product       *Product       `gorm:"foreignKey:ProductId;references:Id"`
@@ -20,8 +20,8 @@ type Message struct {
 }
 
 func (model *Message) BeforeCreate(tx *gorm.DB) error {
-	if model.Id == uuid.Nil {
-		model.Id = uuid.New()
+	if model.Id == "" {
+		model.Id = uuid.NewString()
 	}
 	return nil
 }

@@ -12,6 +12,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.11.0
 	github.com/stretchr/testify v1.10.0
+	github.com/supabase-community/storage-go v0.7.0
 	github.com/vektah/gqlparser/v2 v2.5.28
 	golang.org/x/crypto v0.39.0
 	gorm.io/driver/postgres v1.6.0

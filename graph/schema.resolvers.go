@@ -19,7 +19,8 @@ func (r *mutationResolver) PostUser(ctx context.Context, name string, email stri
 
 // VerifyUser is the resolver for the verify_user field.
 func (r *mutationResolver) VerifyUser(ctx context.Context, email string, password string) (*model.Auth, error) {
-	panic(fmt.Errorf("not implemented: VerifyUser - verify_user"))
+	return &model.Auth{Token: "", User: &model.User{Email: email}}, nil
+	// panic(fmt.Errorf("not implemented: VerifyUser - verify_user"))
 }
 
 // UpdateUser is the resolver for the update_user field.

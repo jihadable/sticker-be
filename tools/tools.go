@@ -11,6 +11,7 @@ import (
 	_ "github.com/redis/go-redis/v9"
 	_ "github.com/stretchr/testify"
 	_ "github.com/stretchr/testify/assert"
+	_ "github.com/supabase-community/storage-go"
 	_ "golang.org/x/crypto/bcrypt"
 	_ "gorm.io/driver/postgres"
 	_ "gorm.io/gorm"
