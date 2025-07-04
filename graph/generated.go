@@ -99,15 +99,15 @@ type ComplexityRoot struct {
 		DeleteProduct       func(childComplexity int, id string) int
 		PostCartProduct     func(childComplexity int, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) int
 		PostCategory        func(childComplexity int, id string) int
-		PostCustomProduct   func(childComplexity int) int
+		PostCustomProduct   func(childComplexity int, image graphql.Upload) int
 		PostMessage         func(childComplexity int, conversationID string, productID *string, customProductID *string, message string) int
-		PostOrder           func(childComplexity int, orderItem []*model.OrderItem) int
-		PostProduct         func(childComplexity int, name string, price int32, stock int32, description string) int
+		PostOrder           func(childComplexity int, orderItems []*model.OrderItem) int
+		PostProduct         func(childComplexity int, name string, price int32, stock int32, description string, image graphql.Upload) int
 		PostUser            func(childComplexity int, name string, email string, password string, phone string, address string) int
 		UpdateCartProduct   func(childComplexity int, id string, quantity int32, size model.Size) int
-		UpdateCustomProduct func(childComplexity int) int
+		UpdateCustomProduct func(childComplexity int, image *graphql.Upload) int
 		UpdateOrder         func(childComplexity int, id string, status string) int
-		UpdateProduct       func(childComplexity int, name string, price int32, stock int32, description string) int
+		UpdateProduct       func(childComplexity int, name string, price int32, stock int32, description string, image *graphql.Upload) int
 		UpdateUser          func(childComplexity int, phone string, address string) int
 		VerifyUser          func(childComplexity int, email string, password string) int
 	}
@@ -177,17 +177,17 @@ type MutationResolver interface {
 	PostUser(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error)
 	VerifyUser(ctx context.Context, email string, password string) (*model.Auth, error)
 	UpdateUser(ctx context.Context, phone string, address string) (*model.User, error)
-	PostProduct(ctx context.Context, name string, price int32, stock int32, description string) (*model.Product, error)
-	UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string) (*model.Product, error)
+	PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error)
+	UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string, image *graphql.Upload) (*model.Product, error)
 	DeleteProduct(ctx context.Context, id string) (bool, error)
-	PostCustomProduct(ctx context.Context) (*model.CustomProduct, error)
-	UpdateCustomProduct(ctx context.Context) (*model.CustomProduct, error)
+	PostCustomProduct(ctx context.Context, image graphql.Upload) (*model.CustomProduct, error)
+	UpdateCustomProduct(ctx context.Context, image *graphql.Upload) (*model.CustomProduct, error)
 	DeleteCustomProduct(ctx context.Context, id string) (bool, error)
 	PostCategory(ctx context.Context, id string) (*model.Category, error)
 	DeleteCategory(ctx context.Context, id string) (bool, error)
 	PostCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error)
 	UpdateCartProduct(ctx context.Context, id string, quantity int32, size model.Size) (*model.CartProduct, error)
-	PostOrder(ctx context.Context, orderItem []*model.OrderItem) (*model.Order, error)
+	PostOrder(ctx context.Context, orderItems []*model.OrderItem) (*model.Order, error)
 	UpdateOrder(ctx context.Context, id string, status string) (*model.Order, error)
 	PostMessage(ctx context.Context, conversationID string, productID *string, customProductID *string, message string) (*model.Message, error)
 }
@@ -464,7 +464,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.Mutation.PostCustomProduct(childComplexity), true
+		args, err := ec.field_Mutation_post_custom_product_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PostCustomProduct(childComplexity, args["image"].(graphql.Upload)), true
 
 	case "Mutation.post_message":
 		if e.complexity.Mutation.PostMessage == nil {
@@ -488,7 +493,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.PostOrder(childComplexity, args["order_item"].([]*model.OrderItem)), true
+		return e.complexity.Mutation.PostOrder(childComplexity, args["order_items"].([]*model.OrderItem)), true
 
 	case "Mutation.post_product":
 		if e.complexity.Mutation.PostProduct == nil {
@@ -500,7 +505,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.PostProduct(childComplexity, args["name"].(string), args["price"].(int32), args["stock"].(int32), args["description"].(string)), true
+		return e.complexity.Mutation.PostProduct(childComplexity, args["name"].(string), args["price"].(int32), args["stock"].(int32), args["description"].(string), args["image"].(graphql.Upload)), true
 
 	case "Mutation.post_user":
 		if e.complexity.Mutation.PostUser == nil {
@@ -531,7 +536,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.Mutation.UpdateCustomProduct(childComplexity), true
+		args, err := ec.field_Mutation_update_custom_product_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCustomProduct(childComplexity, args["image"].(*graphql.Upload)), true
 
 	case "Mutation.update_order":
 		if e.complexity.Mutation.UpdateOrder == nil {
@@ -555,7 +565,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateProduct(childComplexity, args["name"].(string), args["price"].(int32), args["stock"].(int32), args["description"].(string)), true
+		return e.complexity.Mutation.UpdateProduct(childComplexity, args["name"].(string), args["price"].(int32), args["stock"].(int32), args["description"].(string), args["image"].(*graphql.Upload)), true
 
 	case "Mutation.update_user":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -1187,6 +1197,29 @@ func (ec *executionContext) field_Mutation_post_category_argsID(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_post_custom_product_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_post_custom_product_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_post_custom_product_argsImage(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+	if tmp, ok := rawArgs["image"]; ok {
+		return ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal graphql.Upload
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_post_message_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1267,19 +1300,19 @@ func (ec *executionContext) field_Mutation_post_message_argsMessage(
 func (ec *executionContext) field_Mutation_post_order_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_post_order_argsOrderItem(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_post_order_argsOrderItems(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["order_item"] = arg0
+	args["order_items"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_post_order_argsOrderItem(
+func (ec *executionContext) field_Mutation_post_order_argsOrderItems(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) ([]*model.OrderItem, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("order_item"))
-	if tmp, ok := rawArgs["order_item"]; ok {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("order_items"))
+	if tmp, ok := rawArgs["order_items"]; ok {
 		return ec.unmarshalNOrderItem2ᚕᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐOrderItem(ctx, tmp)
 	}
 
@@ -1310,6 +1343,11 @@ func (ec *executionContext) field_Mutation_post_product_args(ctx context.Context
 		return nil, err
 	}
 	args["description"] = arg3
+	arg4, err := ec.field_Mutation_post_product_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_post_product_argsName(
@@ -1361,6 +1399,19 @@ func (ec *executionContext) field_Mutation_post_product_argsDescription(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_post_product_argsImage(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+	if tmp, ok := rawArgs["image"]; ok {
+		return ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal graphql.Upload
 	return zeroVal, nil
 }
 
@@ -1518,6 +1569,29 @@ func (ec *executionContext) field_Mutation_update_cart_product_argsSize(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_update_custom_product_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_update_custom_product_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_update_custom_product_argsImage(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+	if tmp, ok := rawArgs["image"]; ok {
+		return ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal *graphql.Upload
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_update_order_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1582,6 +1656,11 @@ func (ec *executionContext) field_Mutation_update_product_args(ctx context.Conte
 		return nil, err
 	}
 	args["description"] = arg3
+	arg4, err := ec.field_Mutation_update_product_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg4
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_update_product_argsName(
@@ -1633,6 +1712,19 @@ func (ec *executionContext) field_Mutation_update_product_argsDescription(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_update_product_argsImage(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+	if tmp, ok := rawArgs["image"]; ok {
+		return ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal *graphql.Upload
 	return zeroVal, nil
 }
 
@@ -3362,7 +3454,7 @@ func (ec *executionContext) _Mutation_post_product(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostProduct(rctx, fc.Args["name"].(string), fc.Args["price"].(int32), fc.Args["stock"].(int32), fc.Args["description"].(string))
+		return ec.resolvers.Mutation().PostProduct(rctx, fc.Args["name"].(string), fc.Args["price"].(int32), fc.Args["stock"].(int32), fc.Args["description"].(string), fc.Args["image"].(graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3433,7 +3525,7 @@ func (ec *executionContext) _Mutation_update_product(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProduct(rctx, fc.Args["name"].(string), fc.Args["price"].(int32), fc.Args["stock"].(int32), fc.Args["description"].(string))
+		return ec.resolvers.Mutation().UpdateProduct(rctx, fc.Args["name"].(string), fc.Args["price"].(int32), fc.Args["stock"].(int32), fc.Args["description"].(string), fc.Args["image"].(*graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3559,7 +3651,7 @@ func (ec *executionContext) _Mutation_post_custom_product(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostCustomProduct(rctx)
+		return ec.resolvers.Mutation().PostCustomProduct(rctx, fc.Args["image"].(graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3576,7 +3668,7 @@ func (ec *executionContext) _Mutation_post_custom_product(ctx context.Context, f
 	return ec.marshalNCustomProduct2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐCustomProduct(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_post_custom_product(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_post_custom_product(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3593,6 +3685,17 @@ func (ec *executionContext) fieldContext_Mutation_post_custom_product(_ context.
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CustomProduct", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_post_custom_product_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3611,7 +3714,7 @@ func (ec *executionContext) _Mutation_update_custom_product(ctx context.Context,
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateCustomProduct(rctx)
+		return ec.resolvers.Mutation().UpdateCustomProduct(rctx, fc.Args["image"].(*graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3628,7 +3731,7 @@ func (ec *executionContext) _Mutation_update_custom_product(ctx context.Context,
 	return ec.marshalNCustomProduct2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐCustomProduct(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_update_custom_product(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_update_custom_product(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3645,6 +3748,17 @@ func (ec *executionContext) fieldContext_Mutation_update_custom_product(_ contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CustomProduct", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_update_custom_product_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3972,7 +4086,7 @@ func (ec *executionContext) _Mutation_post_order(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostOrder(rctx, fc.Args["order_item"].([]*model.OrderItem))
+		return ec.resolvers.Mutation().PostOrder(rctx, fc.Args["order_items"].([]*model.OrderItem))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10296,6 +10410,22 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (graphql.Upload, error) {
+	res, err := graphql.UnmarshalUpload(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalUpload(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNUser2githubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -10683,6 +10813,24 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	_ = sel
 	_ = ctx
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (*graphql.Upload, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalUpload(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalUpload(*v)
 	return res
 }
 

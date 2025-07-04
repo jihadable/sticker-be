@@ -10,6 +10,8 @@ enum Size {
 	XL
 }
 
+scalar Upload
+
 type User {
 	id: ID!
 	name: String!
@@ -183,18 +185,20 @@ type Mutation {
 		price: Int!
 		stock: Int!
 		description: String!
+		image: Upload!
 	): Product!
 	update_product(
 		name: String!
 		price: Int!
 		stock: Int!
 		description: String!
+		image: Upload
 	): Product!
 	delete_product(id: ID!): Boolean!
 
 	# custom_product
-	post_custom_product: CustomProduct!
-	update_custom_product: CustomProduct!
+	post_custom_product(image: Upload!): CustomProduct!
+	update_custom_product(image: Upload): CustomProduct!
 	delete_custom_product(id: ID!): Boolean!
 
 	# category

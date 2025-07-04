@@ -8,7 +8,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/graph/model"
+	"github.com/jihadable/sticker-be/services"
 	"github.com/jihadable/sticker-be/utils"
 )
 
@@ -29,12 +31,21 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address
 }
 
 // PostProduct is the resolver for the post_product field.
-func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string) (*model.Product, error) {
-	panic(fmt.Errorf("not implemented: PostProduct - post_product"))
+func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error) {
+	storageService := services.NewStorageService()
+
+	url, err := storageService.AddFile(image)
+	fmt.Println(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Product{ID: "1"}, nil
+	// panic(fmt.Errorf("not implemented: PostProduct - post_product"))
 }
 
 // UpdateProduct is the resolver for the update_product field.
-func (r *mutationResolver) UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string) (*model.Product, error) {
+func (r *mutationResolver) UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string, image *graphql.Upload) (*model.Product, error) {
 	panic(fmt.Errorf("not implemented: UpdateProduct - update_product"))
 }
 
@@ -44,12 +55,12 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, 
 }
 
 // PostCustomProduct is the resolver for the post_custom_product field.
-func (r *mutationResolver) PostCustomProduct(ctx context.Context) (*model.CustomProduct, error) {
+func (r *mutationResolver) PostCustomProduct(ctx context.Context, image graphql.Upload) (*model.CustomProduct, error) {
 	panic(fmt.Errorf("not implemented: PostCustomProduct - post_custom_product"))
 }
 
 // UpdateCustomProduct is the resolver for the update_custom_product field.
-func (r *mutationResolver) UpdateCustomProduct(ctx context.Context) (*model.CustomProduct, error) {
+func (r *mutationResolver) UpdateCustomProduct(ctx context.Context, image *graphql.Upload) (*model.CustomProduct, error) {
 	panic(fmt.Errorf("not implemented: UpdateCustomProduct - update_custom_product"))
 }
 
@@ -79,7 +90,7 @@ func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, qua
 }
 
 // PostOrder is the resolver for the post_order field.
-func (r *mutationResolver) PostOrder(ctx context.Context, orderItem []*model.OrderItem) (*model.Order, error) {
+func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.OrderItem) (*model.Order, error) {
 	panic(fmt.Errorf("not implemented: PostOrder - post_order"))
 }
 
@@ -159,18 +170,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) Register(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
-	panic(fmt.Errorf("not implemented: Register - register"))
-}
-func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Auth, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
-}
-*/
