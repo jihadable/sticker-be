@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -11,7 +10,7 @@ import (
 )
 
 type StorageService interface {
-	AddFile(file graphql.Upload) (string, error)
+	AddFile(file graphql.Upload) (*string, error)
 	DeleteFile(fileName string) error
 }
 
@@ -20,19 +19,17 @@ type StorageServiceImpl struct {
 	Bucket  string
 }
 
-func (service *StorageServiceImpl) AddFile(file graphql.Upload) (string, error) {
+func (service *StorageServiceImpl) AddFile(file graphql.Upload) (*string, error) {
 	ext := filepath.Ext(file.Filename)
 	newFileName := uuid.NewString() + ext
 
-	data, err := service.Storage.UploadFile(service.Bucket, newFileName, file.File, storage_go.FileOptions{ContentType: &file.ContentType})
+	_, err := service.Storage.UploadFile(service.Bucket, newFileName, file.File, storage_go.FileOptions{ContentType: &file.ContentType})
 
-	fmt.Println("data:", data)
-	fmt.Println("error:", err)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return newFileName, nil
+	return &newFileName, nil
 }
 
 func (service *StorageServiceImpl) DeleteFile(fileName string) error {
@@ -45,10 +42,6 @@ func NewStorageService() StorageService {
 	storageURL := os.Getenv("STORAGE_URL")
 	storage_api_key := os.Getenv("STORAGE_API_KEY")
 	bucket := os.Getenv("STORAGE_BUCKET")
-
-	// fmt.Println(storageURL)
-	// fmt.Println(storage_api_key)
-	// fmt.Println(bucket)
 
 	return &StorageServiceImpl{
 		Storage: storage_go.NewClient(storageURL, storage_api_key, nil),

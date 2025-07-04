@@ -34,8 +34,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address
 func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error) {
 	storageService := services.NewStorageService()
 
-	url, err := storageService.AddFile(image)
-	fmt.Println(url)
+	err := storageService.DeleteFile("754efeae-af74-431e-8772-47ed7d9a2bc3.png")
 	if err != nil {
 		return nil, err
 	}
