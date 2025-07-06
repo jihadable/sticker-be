@@ -40,6 +40,7 @@ type Product {
 
 type CustomProduct {
 	id: ID!
+	name: String!
 	# customer_id: String!
 	image_url: String!
 
@@ -197,8 +198,8 @@ type Mutation {
 	delete_product(id: ID!): Boolean!
 
 	# custom_product
-	post_custom_product(image: Upload!): CustomProduct!
-	update_custom_product(image: Upload): CustomProduct!
+	post_custom_product(name: String!, image: Upload!): CustomProduct!
+	update_custom_product(name: String!, image: Upload): CustomProduct!
 	delete_custom_product(id: ID!): Boolean!
 
 	# category

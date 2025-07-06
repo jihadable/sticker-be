@@ -7,6 +7,7 @@ import (
 
 type CustomProduct struct {
 	Id         string `gorm:"column:id;primaryKey"`
+	Name       string `gorm:"column:name"`
 	CustomerId string `gorm:"column:customer_id"`
 	ImageURL   string `gorm:"column:image_url"`
 

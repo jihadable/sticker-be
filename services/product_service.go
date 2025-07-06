@@ -14,7 +14,6 @@ import (
 type ProductService interface {
 	AddProduct(product *models.Product, image graphql.Upload) (*models.Product, error)
 	GetProductById(id string) (*models.Product, error)
-	GetProductsByCategory(category_id string) ([]*models.Product, error)
 	GetProducts() ([]*models.Product, error)
 	UpdateProductById(id string, updatedProduct *models.Product, image *graphql.Upload) (*models.Product, error)
 	DeleteProductById(id string) error
@@ -78,35 +77,6 @@ func (service *ProductServiceImpl) GetProductById(id string) (*models.Product, e
 	return &product, nil
 }
 
-func (service *ProductServiceImpl) GetProductsByCategory(category_id string) ([]*models.Product, error) {
-	ctx := context.Background()
-	cacheKey := "product:category:" + category_id
-
-	productInRedis, err := service.Redis.Get(ctx, cacheKey).Result()
-	if err == nil && productInRedis != "" {
-		products := []*models.Product{}
-		err := json.Unmarshal([]byte(productInRedis), &products)
-		if err != nil {
-			return nil, err
-		}
-
-		return products, nil
-	}
-
-	products := []*models.Product{}
-	err = service.DB.Where("category_id = ?", category_id).Preload("Categories").First(&products).Error
-	if err != nil {
-		return nil, err
-	}
-
-	productJSON, err := json.Marshal(products)
-	if err == nil {
-		service.Redis.Set(ctx, cacheKey, productJSON, 5*time.Minute)
-	}
-
-	return products, nil
-}
-
 func (service *ProductServiceImpl) GetProducts() ([]*models.Product, error) {
 	products := []*models.Product{}
 
@@ -142,19 +112,11 @@ func (service *ProductServiceImpl) UpdateProductById(id string, updatedProduct *
 	product.Stock = updatedProduct.Stock
 	product.Description = updatedProduct.Description
 
-	err = service.DB.Save(&product).Error
+	err = service.DB.Save(product).Error
 	if err != nil {
 		return nil, err
 	}
-
-	cacheKeys := []string{"product:" + id}
-
-	if product.Categories != nil {
-		for _, category := range product.Categories {
-			cacheKeys = append(cacheKeys, "product:category:"+category.Id)
-		}
-	}
-	service.Redis.Del(context.Background(), cacheKeys...)
+	service.Redis.Del(context.Background(), "product:"+id)
 
 	return product, nil
 }
@@ -165,18 +127,13 @@ func (service *ProductServiceImpl) DeleteProductById(id string) error {
 		return err
 	}
 
-	err = service.DB.Delete(&product).Error
-
-	cacheKeys := []string{"product:" + id}
-
-	if product.Categories != nil {
-		for _, category := range product.Categories {
-			cacheKeys = append(cacheKeys, "product:category:"+category.Id)
-		}
+	err = service.DB.Delete(product).Error
+	if err != nil {
+		return err
 	}
-	service.Redis.Del(context.Background(), cacheKeys...)
+	service.Redis.Del(context.Background(), "product:"+id)
 
-	return err
+	return nil
 }
 
 func NewProductService(db *gorm.DB, redis *redis.Client) ProductService {
