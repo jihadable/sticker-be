@@ -9,8 +9,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jihadable/sticker-be/graph"
-	"github.com/jihadable/sticker-be/utils"
+	"github.com/jihadable/sticker-be/validators"
 	"github.com/joho/godotenv"
 )
 
@@ -21,6 +22,7 @@ func main() {
 	}
 
 	app := fiber.New()
+	app.Use(cors.New(cors.ConfigDefault))
 
 	app.All("/graphql", func(c *fiber.Ctx) error {
 		handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
@@ -29,20 +31,13 @@ func main() {
 		handler.AddTransport(transport.MultipartForm{})
 
 		authHeader := c.Get("Authorization")
-		ctx := context.WithValue(c.Context(), utils.AuthHeader{}, authHeader)
+		ctx := context.WithValue(c.Context(), validators.AuthHeader, authHeader)
 
 		return adaptor.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r = r.WithContext(ctx)
 			handler.ServeHTTP(w, r)
 		}))(c)
 	})
-
-	// {
-	// 	"query": "mutation ($image: Upload!) { post_product(name: \"umar\", price: 1000, stock: 100, description: \"desc\", image: $image){id} }",
-	// 	"variables": {
-	// 		"image": null
-	// 	}
-	// }
 
 	app.Get("/", adaptor.HTTPHandler(playground.Handler("GraphQL Playground", "/graphql")))
 

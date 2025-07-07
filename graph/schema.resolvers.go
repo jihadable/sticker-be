@@ -11,7 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/graph/model"
 	"github.com/jihadable/sticker-be/services"
-	"github.com/jihadable/sticker-be/utils"
+	"github.com/jihadable/sticker-be/validators"
 )
 
 // PostUser is the resolver for the post_user field.
@@ -105,8 +105,13 @@ func (r *mutationResolver) PostMessage(ctx context.Context, conversationID strin
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
-	authHeader := ctx.Value(utils.AuthHeader{}).(string)
-	fmt.Println(authHeader)
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(credit)
 
 	return &model.User{}, nil
 }
