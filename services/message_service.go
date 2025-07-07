@@ -1,12 +1,13 @@
 package services
 
 import (
+	"github.com/jihadable/sticker-be/models"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type MessageService interface {
-	AddMessage()
+	AddMessage(message *models.Message) (*models.Message, error)
 }
 
 type MessageServiceImpl struct {
@@ -14,8 +15,13 @@ type MessageServiceImpl struct {
 	Redis *redis.Client
 }
 
-func (service *MessageServiceImpl) AddMessage() {
+func (service *MessageServiceImpl) AddMessage(message *models.Message) (*models.Message, error) {
+	err := service.DB.Save(message).Error
+	if err != nil {
+		return nil, err
+	}
 
+	return message, nil
 }
 
 func NewMessageService(db *gorm.DB, redis *redis.Client) MessageService {
