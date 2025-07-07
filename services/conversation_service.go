@@ -21,7 +21,7 @@ type ConversationServiceImpl struct {
 }
 
 func (service *ConversationServiceImpl) AddConversation(conversation *models.Conversation) (*models.Conversation, error) {
-	err := service.DB.Save(conversation).Error
+	err := service.DB.Create(conversation).Error
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ type CategoryServiceImpl struct {
 }
 
 func (service *CategoryServiceImpl) AddCategory(category *models.Category) (*models.Category, error) {
-	err := service.DB.Save(category).Error
+	err := service.DB.Create(category).Error
 	if err != nil {
 		return nil, err
 	}

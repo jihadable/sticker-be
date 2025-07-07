@@ -18,7 +18,7 @@ type CartProductServiceImpl struct {
 }
 
 func (service *CartProductServiceImpl) AddCartProduct(cartProduct *models.CartProduct) (*models.CartProduct, error) {
-	err := service.DB.Save(cartProduct).Error
+	err := service.DB.Create(cartProduct).Error
 	if err != nil {
 		return nil, err
 	}

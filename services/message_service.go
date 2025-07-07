@@ -16,7 +16,7 @@ type MessageServiceImpl struct {
 }
 
 func (service *MessageServiceImpl) AddMessage(message *models.Message) (*models.Message, error) {
-	err := service.DB.Save(message).Error
+	err := service.DB.Create(message).Error
 	if err != nil {
 		return nil, err
 	}

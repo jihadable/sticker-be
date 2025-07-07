@@ -33,7 +33,7 @@ func (service *CustomProductServiceImpl) AddCustomProduct(customProduct *models.
 
 	customProduct.ImageURL = *imageURL
 
-	err = service.DB.Save(customProduct).Error
+	err = service.DB.Create(customProduct).Error
 	if err != nil {
 		return nil, err
 	}
