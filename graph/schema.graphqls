@@ -24,7 +24,7 @@ type User {
 	custom_products: [CustomProduct]!
 	cart: Cart
 	orders: [Order]!
-	conversations: [Conversation]!
+	conversation: Conversation!
 }
 
 type Product {

@@ -28,7 +28,7 @@ func (service *CategoryServiceImpl) AddCategory(category *models.Category) (*mod
 		return nil, err
 	}
 
-	return category, nil
+	return service.GetCategoryById(category.Id)
 }
 
 func (service *CategoryServiceImpl) GetCategoryById(id string) (*models.Category, error) {
@@ -76,7 +76,7 @@ func (service *CategoryServiceImpl) GetCategories() ([]*models.Category, error) 
 	}
 
 	categories := []*models.Category{}
-	err = service.DB.Find(&categories).Error
+	err = service.DB.Preload("Products").Find(&categories).Error
 	if err != nil {
 		return nil, err
 	}

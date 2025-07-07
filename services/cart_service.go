@@ -26,7 +26,7 @@ func (service *CartServiceImpl) AddCart(cart *models.Cart) (*models.Cart, error)
 		return nil, err
 	}
 
-	return cart, nil
+	return service.GetCartByCustomer(cart.CustomerId)
 }
 
 func (service *CartServiceImpl) GetCartByCustomer(customer_id string) (*models.Cart, error) {

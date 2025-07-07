@@ -30,12 +30,7 @@ func (service *OrderServiceImpl) AddOrder(order *models.Order, orderProducts []*
 		return nil, err
 	}
 
-	order, err = service.GetOrderById(order.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	return order, nil
+	return service.GetOrderById(order.Id)
 }
 
 func (service *OrderServiceImpl) GetOrderById(id string) (*models.Order, error) {
@@ -72,7 +67,7 @@ func (service *OrderServiceImpl) UpdateOrderById(id string, updatedOrder *models
 		return nil, err
 	}
 
-	return order, nil
+	return service.GetOrderById(order.Id)
 }
 
 func NewOrderService(db *gorm.DB, redis *redis.Client) OrderService {

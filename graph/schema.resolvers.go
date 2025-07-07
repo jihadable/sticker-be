@@ -54,12 +54,12 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, 
 }
 
 // PostCustomProduct is the resolver for the post_custom_product field.
-func (r *mutationResolver) PostCustomProduct(ctx context.Context, image graphql.Upload) (*model.CustomProduct, error) {
+func (r *mutationResolver) PostCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error) {
 	panic(fmt.Errorf("not implemented: PostCustomProduct - post_custom_product"))
 }
 
 // UpdateCustomProduct is the resolver for the update_custom_product field.
-func (r *mutationResolver) UpdateCustomProduct(ctx context.Context, image *graphql.Upload) (*model.CustomProduct, error) {
+func (r *mutationResolver) UpdateCustomProduct(ctx context.Context, name string, image *graphql.Upload) (*model.CustomProduct, error) {
 	panic(fmt.Errorf("not implemented: UpdateCustomProduct - update_custom_product"))
 }
 

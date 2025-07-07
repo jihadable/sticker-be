@@ -21,7 +21,17 @@ func (service *MessageServiceImpl) AddMessage(message *models.Message) (*models.
 		return nil, err
 	}
 
-	return message, nil
+	return service.GetMessageById(message.Id)
+}
+
+func (service *MessageServiceImpl) GetMessageById(id string) (*models.Message, error) {
+	message := models.Message{}
+	err := service.DB.Where("id = ?", id).Preload("Conversation").Preload("Product").Preload("CustomProduct").Preload("Sender").First(&message).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &message, nil
 }
 
 func NewMessageService(db *gorm.DB, redis *redis.Client) MessageService {

@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		Customer func(childComplexity int) int
 		ID       func(childComplexity int) int
 		ImageURL func(childComplexity int) int
+		Name     func(childComplexity int) int
 	}
 
 	Message struct {
@@ -99,13 +100,13 @@ type ComplexityRoot struct {
 		DeleteProduct       func(childComplexity int, id string) int
 		PostCartProduct     func(childComplexity int, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) int
 		PostCategory        func(childComplexity int, id string) int
-		PostCustomProduct   func(childComplexity int, image graphql.Upload) int
+		PostCustomProduct   func(childComplexity int, name string, image graphql.Upload) int
 		PostMessage         func(childComplexity int, conversationID string, productID *string, customProductID *string, message string) int
 		PostOrder           func(childComplexity int, orderItems []*model.OrderItem) int
 		PostProduct         func(childComplexity int, name string, price int32, stock int32, description string, image graphql.Upload) int
 		PostUser            func(childComplexity int, name string, email string, password string, phone string, address string) int
 		UpdateCartProduct   func(childComplexity int, id string, quantity int32, size model.Size) int
-		UpdateCustomProduct func(childComplexity int, image *graphql.Upload) int
+		UpdateCustomProduct func(childComplexity int, name string, image *graphql.Upload) int
 		UpdateOrder         func(childComplexity int, id string, status string) int
 		UpdateProduct       func(childComplexity int, name string, price int32, stock int32, description string, image *graphql.Upload) int
 		UpdateUser          func(childComplexity int, phone string, address string) int
@@ -162,7 +163,7 @@ type ComplexityRoot struct {
 	User struct {
 		Address        func(childComplexity int) int
 		Cart           func(childComplexity int) int
-		Conversations  func(childComplexity int) int
+		Conversation   func(childComplexity int) int
 		CustomProducts func(childComplexity int) int
 		Email          func(childComplexity int) int
 		ID             func(childComplexity int) int
@@ -180,8 +181,8 @@ type MutationResolver interface {
 	PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error)
 	UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string, image *graphql.Upload) (*model.Product, error)
 	DeleteProduct(ctx context.Context, id string) (bool, error)
-	PostCustomProduct(ctx context.Context, image graphql.Upload) (*model.CustomProduct, error)
-	UpdateCustomProduct(ctx context.Context, image *graphql.Upload) (*model.CustomProduct, error)
+	PostCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error)
+	UpdateCustomProduct(ctx context.Context, name string, image *graphql.Upload) (*model.CustomProduct, error)
 	DeleteCustomProduct(ctx context.Context, id string) (bool, error)
 	PostCategory(ctx context.Context, id string) (*model.Category, error)
 	DeleteCategory(ctx context.Context, id string) (bool, error)
@@ -357,6 +358,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CustomProduct.ImageURL(childComplexity), true
 
+	case "CustomProduct.name":
+		if e.complexity.CustomProduct.Name == nil {
+			break
+		}
+
+		return e.complexity.CustomProduct.Name(childComplexity), true
+
 	case "Message.conversation":
 		if e.complexity.Message.Conversation == nil {
 			break
@@ -469,7 +477,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.PostCustomProduct(childComplexity, args["image"].(graphql.Upload)), true
+		return e.complexity.Mutation.PostCustomProduct(childComplexity, args["name"].(string), args["image"].(graphql.Upload)), true
 
 	case "Mutation.post_message":
 		if e.complexity.Mutation.PostMessage == nil {
@@ -541,7 +549,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateCustomProduct(childComplexity, args["image"].(*graphql.Upload)), true
+		return e.complexity.Mutation.UpdateCustomProduct(childComplexity, args["name"].(string), args["image"].(*graphql.Upload)), true
 
 	case "Mutation.update_order":
 		if e.complexity.Mutation.UpdateOrder == nil {
@@ -829,12 +837,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.User.Cart(childComplexity), true
 
-	case "User.conversations":
-		if e.complexity.User.Conversations == nil {
+	case "User.conversation":
+		if e.complexity.User.Conversation == nil {
 			break
 		}
 
-		return e.complexity.User.Conversations(childComplexity), true
+		return e.complexity.User.Conversation(childComplexity), true
 
 	case "User.custom_products":
 		if e.complexity.User.CustomProducts == nil {
@@ -1200,13 +1208,31 @@ func (ec *executionContext) field_Mutation_post_category_argsID(
 func (ec *executionContext) field_Mutation_post_custom_product_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_post_custom_product_argsImage(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_post_custom_product_argsName(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["image"] = arg0
+	args["name"] = arg0
+	arg1, err := ec.field_Mutation_post_custom_product_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_post_custom_product_argsName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_post_custom_product_argsImage(
 	ctx context.Context,
 	rawArgs map[string]any,
@@ -1572,13 +1598,31 @@ func (ec *executionContext) field_Mutation_update_cart_product_argsSize(
 func (ec *executionContext) field_Mutation_update_custom_product_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_update_custom_product_argsImage(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_update_custom_product_argsName(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["image"] = arg0
+	args["name"] = arg0
+	arg1, err := ec.field_Mutation_update_custom_product_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_update_custom_product_argsName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_update_custom_product_argsImage(
 	ctx context.Context,
 	rawArgs map[string]any,
@@ -2034,8 +2078,8 @@ func (ec *executionContext) fieldContext_Auth_user(_ context.Context, field grap
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2144,8 +2188,8 @@ func (ec *executionContext) fieldContext_Cart_customer(_ context.Context, field 
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2492,6 +2536,8 @@ func (ec *executionContext) fieldContext_CartProduct_custom_product(_ context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -2708,8 +2754,8 @@ func (ec *executionContext) fieldContext_Conversation_customer(_ context.Context
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2819,6 +2865,50 @@ func (ec *executionContext) fieldContext_CustomProduct_id(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _CustomProduct_name(ctx context.Context, field graphql.CollectedField, obj *model.CustomProduct) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProduct_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProduct_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CustomProduct_image_url(ctx context.Context, field graphql.CollectedField, obj *model.CustomProduct) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CustomProduct_image_url(ctx, field)
 	if err != nil {
@@ -2920,8 +3010,8 @@ func (ec *executionContext) fieldContext_CustomProduct_customer(_ context.Contex
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3164,6 +3254,8 @@ func (ec *executionContext) fieldContext_Message_custom_product(_ context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -3232,8 +3324,8 @@ func (ec *executionContext) fieldContext_Message_sender(_ context.Context, field
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3420,8 +3512,8 @@ func (ec *executionContext) fieldContext_Mutation_update_user(ctx context.Contex
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3651,7 +3743,7 @@ func (ec *executionContext) _Mutation_post_custom_product(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostCustomProduct(rctx, fc.Args["image"].(graphql.Upload))
+		return ec.resolvers.Mutation().PostCustomProduct(rctx, fc.Args["name"].(string), fc.Args["image"].(graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3678,6 +3770,8 @@ func (ec *executionContext) fieldContext_Mutation_post_custom_product(ctx contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -3714,7 +3808,7 @@ func (ec *executionContext) _Mutation_update_custom_product(ctx context.Context,
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateCustomProduct(rctx, fc.Args["image"].(*graphql.Upload))
+		return ec.resolvers.Mutation().UpdateCustomProduct(rctx, fc.Args["name"].(string), fc.Args["image"].(*graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3741,6 +3835,8 @@ func (ec *executionContext) fieldContext_Mutation_update_custom_product(ctx cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -4464,8 +4560,8 @@ func (ec *executionContext) fieldContext_Order_customer(_ context.Context, field
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4860,6 +4956,8 @@ func (ec *executionContext) fieldContext_OrderProduct_custom_product(_ context.C
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -5352,8 +5450,8 @@ func (ec *executionContext) fieldContext_Query_user(_ context.Context, field gra
 				return ec.fieldContext_User_cart(ctx, field)
 			case "orders":
 				return ec.fieldContext_User_orders(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
+			case "conversation":
+				return ec.fieldContext_User_conversation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5522,6 +5620,8 @@ func (ec *executionContext) fieldContext_Query_custom_product(_ context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -5574,6 +5674,8 @@ func (ec *executionContext) fieldContext_Query_custom_products_by_user(_ context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -6334,6 +6436,8 @@ func (ec *executionContext) fieldContext_User_custom_products(_ context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_CustomProduct_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomProduct_name(ctx, field)
 			case "image_url":
 				return ec.fieldContext_CustomProduct_image_url(ctx, field)
 			case "customer":
@@ -6450,8 +6554,8 @@ func (ec *executionContext) fieldContext_User_orders(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _User_conversations(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_conversations(ctx, field)
+func (ec *executionContext) _User_conversation(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_conversation(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6464,7 +6568,7 @@ func (ec *executionContext) _User_conversations(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Conversations, nil
+		return obj.Conversation, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6476,12 +6580,12 @@ func (ec *executionContext) _User_conversations(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Conversation)
+	res := resTmp.(*model.Conversation)
 	fc.Result = res
-	return ec.marshalNConversation2ᚕᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐConversation(ctx, field.Selections, res)
+	return ec.marshalNConversation2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐConversation(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_conversations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_conversation(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -8776,6 +8880,11 @@ func (ec *executionContext) _CustomProduct(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "name":
+			out.Values[i] = ec._CustomProduct_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "image_url":
 			out.Values[i] = ec._CustomProduct_image_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -9598,8 +9707,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "conversations":
-			out.Values[i] = ec._User_conversations(ctx, field, obj)
+		case "conversation":
+			out.Values[i] = ec._User_conversation(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -10069,44 +10178,6 @@ func (ec *executionContext) marshalNCategory2ᚖgithubᚗcomᚋjihadableᚋstick
 		return graphql.Null
 	}
 	return ec._Category(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNConversation2ᚕᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐConversation(ctx context.Context, sel ast.SelectionSet, v []*model.Conversation) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOConversation2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐConversation(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) marshalNConversation2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐConversation(ctx context.Context, sel ast.SelectionSet, v *model.Conversation) graphql.Marshaler {

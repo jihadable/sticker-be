@@ -44,7 +44,7 @@ func (service *ProductServiceImpl) AddProduct(product *models.Product, image gra
 	}
 	service.Redis.Set(context.Background(), "product:"+product.Id, productJSON, 5*time.Minute)
 
-	return product, nil
+	return service.GetProductById(product.Id)
 }
 
 func (service *ProductServiceImpl) GetProductById(id string) (*models.Product, error) {
@@ -118,7 +118,7 @@ func (service *ProductServiceImpl) UpdateProductById(id string, updatedProduct *
 	}
 	service.Redis.Del(context.Background(), "product:"+id)
 
-	return product, nil
+	return service.GetProductById(product.Id)
 }
 
 func (service *ProductServiceImpl) DeleteProductById(id string) error {

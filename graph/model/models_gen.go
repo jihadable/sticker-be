@@ -42,6 +42,7 @@ type Conversation struct {
 
 type CustomProduct struct {
 	ID       string `json:"id"`
+	Name     string `json:"name"`
 	ImageURL string `json:"image_url"`
 	Customer *User  `json:"customer"`
 }
@@ -112,7 +113,7 @@ type User struct {
 	CustomProducts []*CustomProduct `json:"custom_products"`
 	Cart           *Cart            `json:"cart,omitempty"`
 	Orders         []*Order         `json:"orders"`
-	Conversations  []*Conversation  `json:"conversations"`
+	Conversation   *Conversation    `json:"conversation"`
 }
 
 type Role string

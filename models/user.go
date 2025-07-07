@@ -17,6 +17,7 @@ type User struct {
 	CustomProducts []CustomProduct `gorm:"foreignKey:CustomerId;references:Id"`
 	Cart           Cart            `gorm:"foreignKey:CustomerId;references:Id"`
 	Orders         []Order         `gorm:"foreignKey:CustomerId;references:Id"`
+	Conversation   Conversation    `gorm:"foreignKey:CustomerId;references:Id"`
 }
 
 func (model *User) BeforeCreate(tx *gorm.DB) error {

@@ -35,13 +35,18 @@ func (service *UserServiceImpl) AddUser(user *models.User) (*models.User, error)
 		return nil, err
 	}
 
+	user, err = service.GetUserById(user.Id)
+	if err != nil {
+		return nil, err
+	}
+
 	return user, nil
 }
 
 func (service *UserServiceImpl) GetUserById(id string) (*models.User, error) {
 	user := models.User{}
 
-	err := service.DB.Where("id = ?", id).First(&user).Error
+	err := service.DB.Where("id = ?", id).Preload("CustomProducts").Preload("Cart").Preload("Orders").Preload("Conversation").First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +55,7 @@ func (service *UserServiceImpl) GetUserById(id string) (*models.User, error) {
 }
 
 func (service *UserServiceImpl) UpdateUserById(id string, updatedUser *models.User) (*models.User, error) {
-	user := models.User{}
-
-	err := service.DB.Where("id = ?", id).First(&user).Error
+	user, err := service.GetUserById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +69,7 @@ func (service *UserServiceImpl) UpdateUserById(id string, updatedUser *models.Us
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (service *UserServiceImpl) VerifyUser(email, password string) (*models.User, error) {

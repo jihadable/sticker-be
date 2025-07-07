@@ -23,12 +23,12 @@ func (service *CartProductServiceImpl) AddCartProduct(cartProduct *models.CartPr
 		return nil, err
 	}
 
-	return cartProduct, nil
+	return service.GetCartProductById(cartProduct.Id)
 }
 
 func (service *CartProductServiceImpl) GetCartProductById(id string) (*models.CartProduct, error) {
 	cartProduct := models.CartProduct{}
-	err := service.DB.Where("id = ?", id).First(&cartProduct).Error
+	err := service.DB.Where("id = ?", id).Preload("Cart").Preload("Product").Preload("CustomProduct").First(&cartProduct).Error
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (service *CartProductServiceImpl) UpdateCartProductById(id string, updatedC
 		return nil, err
 	}
 
-	return cartProduct, nil
+	return service.GetCartProductById(cartProduct.Id)
 }
 
 func (service *CartProductServiceImpl) DeleteCartProductById(id string) error {

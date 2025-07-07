@@ -26,7 +26,7 @@ func (service *ConversationServiceImpl) AddConversation(conversation *models.Con
 		return nil, err
 	}
 
-	return conversation, nil
+	return service.GetConversationById(conversation.Id)
 }
 
 func (service *ConversationServiceImpl) GetConversationById(id string) (*models.Conversation, error) {

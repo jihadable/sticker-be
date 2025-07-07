@@ -47,7 +47,7 @@ func (service *CustomProductServiceImpl) AddCustomProduct(customProduct *models.
 	}
 	service.Redis.Set(ctx, "custom_product:"+customProduct.Id, customProductJSON, 30*time.Minute)
 
-	return customProduct, nil
+	return service.GetCustomProductById(customProduct.Id)
 }
 
 func (service *CustomProductServiceImpl) GetCustomProductById(id string) (*models.CustomProduct, error) {
@@ -66,7 +66,7 @@ func (service *CustomProductServiceImpl) GetCustomProductById(id string) (*model
 	}
 
 	customProduct := models.CustomProduct{}
-	err = service.DB.Where("id = ?", id).First(&customProduct).Error
+	err = service.DB.Where("id = ?", id).Preload("Customer").First(&customProduct).Error
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (service *CustomProductServiceImpl) GetCustomProductsByCustomer(customer_id
 	}
 
 	customProducts := []*models.CustomProduct{}
-	err = service.DB.Where("customer_id = ?", customer_id).Find(&customProducts).Error
+	err = service.DB.Where("customer_id = ?", customer_id).Preload("Customer").Find(&customProducts).Error
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (service *CustomProductServiceImpl) UpdateCustomProductById(id string, upda
 
 	service.Redis.Del(context.Background(), cacheKeys...)
 
-	return customProduct, nil
+	return service.GetCustomProductById(customProduct.Id)
 }
 
 func (service *CustomProductServiceImpl) DeleteCustomProductById(id string) error {
