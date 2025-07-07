@@ -23,6 +23,9 @@ func (model *User) BeforeCreate(tx *gorm.DB) error {
 	if model.Id == "" {
 		model.Id = uuid.NewString()
 	}
+	if model.Role == "" {
+		model.Role = "customer"
+	}
 
 	return nil
 }

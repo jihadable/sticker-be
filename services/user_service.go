@@ -29,7 +29,6 @@ func (service *UserServiceImpl) AddUser(user *models.User) (*models.User, error)
 	}
 
 	user.Password = hashedPassword
-	user.Role = "customer"
 
 	err = service.DB.Create(user).Error
 	if err != nil {
