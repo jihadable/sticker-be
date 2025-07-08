@@ -10,8 +10,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/graph/model"
+	"github.com/jihadable/sticker-be/models"
 	"github.com/jihadable/sticker-be/services"
-	"github.com/jihadable/sticker-be/validators"
+	"github.com/jihadable/sticker-be/utils/mapper"
 )
 
 // PostUser is the resolver for the post_user field.
@@ -105,15 +106,23 @@ func (r *mutationResolver) PostMessage(ctx context.Context, conversationID strin
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
-	authHeader := ctx.Value(validators.AuthHeader).(string)
+	// authHeader := ctx.Value(validators.AuthHeader).(string)
+	// credit, err := validators.AuthValidator(authHeader, nil)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println(credit)
 
-	credit, err := validators.AuthValidator(authHeader, nil)
-	if err != nil {
-		return nil, err
+	// _, err := userService.GetUserById(credit["user_id"])
+	// if err != nil {
+	// 	return nil, err
+	// }
+	user := models.User{
+		Name: "Umar",
+		Role: "customer",
 	}
-	fmt.Println(credit)
 
-	return &model.User{}, nil
+	return mapper.DBUserToGraphQLUser(&user), nil
 }
 
 // Product is the resolver for the product field.

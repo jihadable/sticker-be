@@ -10,6 +10,7 @@ type OrderProduct struct {
 	OrderId         string  `gorm:"column:order_id"`
 	ProductId       *string `gorm:"column:product_id"`
 	CustomProductId *string `gorm:"column:custom_product_id"`
+	Quantity        int     `gorm:"column:quantity"`
 	Size            string  `gorm:"column:size"`
 	SubtotalPrice   int     `gorm:"column:subtotal_price"`
 

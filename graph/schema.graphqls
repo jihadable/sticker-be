@@ -18,7 +18,7 @@ type User {
 	email: String!
 	# password: String!
 	role: Role!
-	phone: Int!
+	phone: String!
 	address: String!
 
 	custom_products: [CustomProduct]!

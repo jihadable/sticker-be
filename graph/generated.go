@@ -6333,9 +6333,9 @@ func (ec *executionContext) _User_phone(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int32)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6345,7 +6345,7 @@ func (ec *executionContext) fieldContext_User_phone(_ context.Context, field gra
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil

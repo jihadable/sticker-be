@@ -108,7 +108,7 @@ type User struct {
 	Name           string           `json:"name"`
 	Email          string           `json:"email"`
 	Role           Role             `json:"role"`
-	Phone          int32            `json:"phone"`
+	Phone          string           `json:"phone"`
 	Address        string           `json:"address"`
 	CustomProducts []*CustomProduct `json:"custom_products"`
 	Cart           *Cart            `json:"cart,omitempty"`
