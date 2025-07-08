@@ -141,27 +141,86 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, 
 
 // PostCustomProduct is the resolver for the post_custom_product field.
 func (r *mutationResolver) PostCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error) {
-	panic(fmt.Errorf("not implemented: PostCustomProduct - post_custom_product"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
+	if err != nil {
+		return nil, err
+	}
+
+	customProduct, err := r.CustomProductService.AddCustomProduct(&models.CustomProduct{
+		Name: name,
+	}, image)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCustomProductToGraphQLCustomProduct(customProduct), nil
 }
 
 // UpdateCustomProduct is the resolver for the update_custom_product field.
-func (r *mutationResolver) UpdateCustomProduct(ctx context.Context, name string, image *graphql.Upload) (*model.CustomProduct, error) {
-	panic(fmt.Errorf("not implemented: UpdateCustomProduct - update_custom_product"))
+func (r *mutationResolver) UpdateCustomProduct(ctx context.Context, id string, name string, image *graphql.Upload) (*model.CustomProduct, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
+	if err != nil {
+		return nil, err
+	}
+
+	customProduct, err := r.CustomProductService.UpdateCustomProductById(id, &models.CustomProduct{
+		Name: name,
+	}, image)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCustomProductToGraphQLCustomProduct(customProduct), nil
 }
 
 // DeleteCustomProduct is the resolver for the delete_custom_product field.
 func (r *mutationResolver) DeleteCustomProduct(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteCustomProduct - delete_custom_product"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
+	if err != nil {
+		return false, err
+	}
+
+	err = r.CustomProductService.DeleteCustomProductById(id)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // PostCategory is the resolver for the post_category field.
 func (r *mutationResolver) PostCategory(ctx context.Context, id string) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: PostCategory - post_category"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return nil, err
+	}
+
+	category, err := r.CategoryService.AddCategory(&models.Category{Id: id})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCategoryToGraphQLCategory(category), nil
 }
 
 // DeleteCategory is the resolver for the delete_category field.
 func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteCategory - delete_category"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return false, err
+	}
+
+	err = r.CategoryService.DeleteCategoryById(id)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // PostCartProduct is the resolver for the post_cart_product field.
@@ -191,62 +250,138 @@ func (r *mutationResolver) PostMessage(ctx context.Context, conversationID strin
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
-	// authHeader := ctx.Value(validators.AuthHeader).(string)
-	// credit, err := validators.AuthValidator(authHeader, nil)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// fmt.Println(credit)
-
-	// _, err := userService.GetUserById(credit["user_id"])
-	// if err != nil {
-	// 	return nil, err
-	// }
-	user := models.User{
-		Name: "Umar",
-		Role: "customer",
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
 	}
 
-	return mapper.DBUserToGraphQLUser(&user), nil
+	user, err := r.UserService.GetUserById(credit["user_id"])
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBUserToGraphQLUser(user), nil
 }
 
 // Product is the resolver for the product field.
-func (r *queryResolver) Product(ctx context.Context) (*model.Product, error) {
-	panic(fmt.Errorf("not implemented: Product - product"))
+func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	product, err := r.ProductService.GetProductById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBProductToGraphQLProduct(product), nil
 }
 
 // Products is the resolver for the products field.
 func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) {
-	panic(fmt.Errorf("not implemented: Products - products"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	products, err := r.ProductService.GetProducts()
+	if err != nil {
+		return nil, err
+	}
+
+	productsResponse := make([]*model.Product, len(products))
+	for i, product := range products {
+		productsResponse[i] = mapper.DBProductToGraphQLProduct(product)
+	}
+
+	return productsResponse, nil
 }
 
 // CustomProduct is the resolver for the custom_product field.
-func (r *queryResolver) CustomProduct(ctx context.Context) (*model.CustomProduct, error) {
-	panic(fmt.Errorf("not implemented: CustomProduct - custom_product"))
+func (r *queryResolver) CustomProduct(ctx context.Context, id string) (*model.CustomProduct, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	customProduct, err := r.CustomProductService.GetCustomProductById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCustomProductToGraphQLCustomProduct(customProduct), nil
 }
 
 // CustomProductsByUser is the resolver for the custom_products_by_user field.
 func (r *queryResolver) CustomProductsByUser(ctx context.Context) ([]*model.CustomProduct, error) {
-	panic(fmt.Errorf("not implemented: CustomProductsByUser - custom_products_by_user"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	customProducts, err := r.CustomProductService.GetCustomProductsByCustomer(credit["user_id"])
+	if err != nil {
+		return nil, err
+	}
+
+	customProductsResponse := make([]*model.CustomProduct, len(customProducts))
+	for i, customProduct := range customProducts {
+		customProductsResponse[i] = mapper.DBCustomProductToGraphQLCustomProduct(customProduct)
+	}
+
+	return customProductsResponse, nil
 }
 
 // Category is the resolver for the category field.
-func (r *queryResolver) Category(ctx context.Context) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: Category - category"))
+func (r *queryResolver) Category(ctx context.Context, id string) (*model.Category, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	category, err := r.CategoryService.GetCategoryById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCategoryToGraphQLCategory(category), nil
 }
 
 // Categories is the resolver for the categories field.
 func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
-	panic(fmt.Errorf("not implemented: Categories - categories"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	categories, err := r.CategoryService.GetCategories()
+	if err != nil {
+		return nil, err
+	}
+
+	categoriesResponse := make([]*model.Category, len(categories))
+	for i, category := range categories {
+		categoriesResponse[i] = mapper.DBCategoryToGraphQLCategory(category)
+	}
+
+	return categoriesResponse, nil
 }
 
-// Cart is the resolver for the cart field.
-func (r *queryResolver) Cart(ctx context.Context) (*model.Cart, error) {
-	panic(fmt.Errorf("not implemented: Cart - cart"))
+// CartByUser is the resolver for the cart_by_user field.
+func (r *queryResolver) CartByUser(ctx context.Context) (*model.Cart, error) {
+	panic(fmt.Errorf("not implemented: CartByUser - cart_by_user"))
 }
 
 // Order is the resolver for the order field.
-func (r *queryResolver) Order(ctx context.Context) (*model.Order, error) {
+func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, error) {
 	panic(fmt.Errorf("not implemented: Order - order"))
 }
 
@@ -268,3 +403,15 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) Cart(ctx context.Context) (*model.Cart, error) {
+	panic(fmt.Errorf("not implemented: Cart - cart"))
+}
+*/

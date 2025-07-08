@@ -146,22 +146,22 @@ type Query {
 	user: User!
 
 	# product
-	product: Product!
+	product(id: ID!): Product!
 	products: [Product]!
 
 	# custom_product
-	custom_product: CustomProduct!
+	custom_product(id: ID!): CustomProduct!
 	custom_products_by_user: [CustomProduct]!
 
 	# category
-	category: Category!
+	category(id: ID!): Category!
 	categories: [Category]!
 
 	# cart
-	cart: Cart!
+	cart_by_user: Cart!
 
 	# order
-	order: Order!
+	order(id: ID!): Order!
 	orders_by_user: [Order]!
 
 	# conversation
@@ -200,7 +200,11 @@ type Mutation {
 
 	# custom_product
 	post_custom_product(name: String!, image: Upload!): CustomProduct!
-	update_custom_product(name: String!, image: Upload): CustomProduct!
+	update_custom_product(
+		id: ID!
+		name: String!
+		image: Upload
+	): CustomProduct!
 	delete_custom_product(id: ID!): Boolean!
 
 	# category
