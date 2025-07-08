@@ -26,12 +26,12 @@ func (service *CartServiceImpl) AddCart(cart *models.Cart) (*models.Cart, error)
 		return nil, err
 	}
 
-	return service.GetCartByCustomer(cart.CustomerId)
+	return service.GetCartById(cart.Id)
 }
 
-func (service *CartServiceImpl) GetCartByCustomer(customer_id string) (*models.Cart, error) {
+func (service *CartServiceImpl) GetCartById(id string) (*models.Cart, error) {
 	ctx := context.Background()
-	cacheKey := "cart:customer:" + customer_id
+	cacheKey := "cart:" + id
 
 	cartInRedis, err := service.Redis.Get(ctx, cacheKey).Result()
 	if err == nil && cartInRedis != "" {
@@ -45,7 +45,7 @@ func (service *CartServiceImpl) GetCartByCustomer(customer_id string) (*models.C
 	}
 
 	cart := models.Cart{}
-	err = service.DB.Where("customer_id = ?", customer_id).Preload("Customer").Preload("Products").First(&cart).Error
+	err = service.DB.Where("id = ?", id).Preload("Customer").Preload("Products").First(&cart).Error
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +55,16 @@ func (service *CartServiceImpl) GetCartByCustomer(customer_id string) (*models.C
 		return nil, err
 	}
 	service.Redis.Set(ctx, cacheKey, cartJSON, 30*time.Minute)
+
+	return &cart, nil
+}
+
+func (service *CartServiceImpl) GetCartByCustomer(customer_id string) (*models.Cart, error) {
+	cart := models.Cart{}
+	err := service.DB.Where("customer_id = ?", customer_id).Preload("Customer").Preload("Products").First(&cart).Error
+	if err != nil {
+		return nil, err
+	}
 
 	return &cart, nil
 }

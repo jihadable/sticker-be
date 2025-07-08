@@ -13,7 +13,7 @@ type Message struct {
 	SenderId        string  `gorm:"column:sender_id"`
 	Message         string  `gorm:"column:message"`
 
-	Conversation  *Conversation  `gorm:"foreignKey:ConversationId;references:Id"`
+	// Conversation  *Conversation  `gorm:"foreignKey:ConversationId;references:Id"`
 	Product       *Product       `gorm:"foreignKey:ProductId;references:Id"`
 	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id"`
 	Sender        *User          `gorm:"foreignKey:SenderId;references:Id"`

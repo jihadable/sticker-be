@@ -45,3 +45,16 @@ func AuthValidator(authHeader string, userService services.UserService) (map[str
 		"role":    role,
 	}, nil
 }
+
+func RoleValidator(authHeader string, userService services.UserService, allowedRole string) (map[string]string, error) {
+	credit, err := AuthValidator(authHeader, userService)
+	if err != nil {
+		return nil, err
+	}
+
+	if credit["user_id"] != allowedRole {
+		return nil, errors.New("peran pengguna tidak diizinkan")
+	}
+
+	return credit, nil
+}

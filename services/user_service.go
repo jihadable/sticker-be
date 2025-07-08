@@ -35,18 +35,13 @@ func (service *UserServiceImpl) AddUser(user *models.User) (*models.User, error)
 		return nil, err
 	}
 
-	user, err = service.GetUserById(user.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return service.GetUserById(user.Id)
 }
 
 func (service *UserServiceImpl) GetUserById(id string) (*models.User, error) {
 	user := models.User{}
 
-	err := service.DB.Where("id = ?", id).Preload("CustomProducts").Preload("Cart").Preload("Orders").Preload("Conversation").First(&user).Error
+	err := service.DB.Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return nil, err
 	}

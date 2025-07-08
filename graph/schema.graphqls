@@ -21,10 +21,10 @@ type User {
 	phone: String!
 	address: String!
 
-	custom_products: [CustomProduct]!
-	cart: Cart
-	orders: [Order]!
-	conversation: Conversation!
+	# custom_products: [CustomProduct]!
+	# cart: Cart
+	# orders: [Order]!
+	# conversation: Conversation!
 }
 
 type Product {
@@ -122,7 +122,7 @@ type Message {
 	# sender_id: String!
 	message: String!
 
-	conversation: Conversation!
+	# conversation: Conversation!
 	product: Product
 	custom_product: CustomProduct
 	sender: User!
@@ -189,6 +189,7 @@ type Mutation {
 		image: Upload!
 	): Product!
 	update_product(
+		id: ID!
 		name: String!
 		price: Int!
 		stock: Int!

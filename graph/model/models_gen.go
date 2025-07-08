@@ -50,7 +50,6 @@ type CustomProduct struct {
 type Message struct {
 	ID            string         `json:"id"`
 	Message       string         `json:"message"`
-	Conversation  *Conversation  `json:"conversation"`
 	Product       *Product       `json:"product,omitempty"`
 	CustomProduct *CustomProduct `json:"custom_product,omitempty"`
 	Sender        *User          `json:"sender"`
@@ -104,16 +103,12 @@ type Query struct {
 }
 
 type User struct {
-	ID             string           `json:"id"`
-	Name           string           `json:"name"`
-	Email          string           `json:"email"`
-	Role           Role             `json:"role"`
-	Phone          string           `json:"phone"`
-	Address        string           `json:"address"`
-	CustomProducts []*CustomProduct `json:"custom_products"`
-	Cart           *Cart            `json:"cart,omitempty"`
-	Orders         []*Order         `json:"orders"`
-	Conversation   *Conversation    `json:"conversation"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Role    Role   `json:"role"`
+	Phone   string `json:"phone"`
+	Address string `json:"address"`
 }
 
 type Role string

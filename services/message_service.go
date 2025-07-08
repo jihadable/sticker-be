@@ -26,7 +26,7 @@ func (service *MessageServiceImpl) AddMessage(message *models.Message) (*models.
 
 func (service *MessageServiceImpl) GetMessageById(id string) (*models.Message, error) {
 	message := models.Message{}
-	err := service.DB.Where("id = ?", id).Preload("Conversation").Preload("Product").Preload("CustomProduct").Preload("Sender").First(&message).Error
+	err := service.DB.Where("id = ?", id).Preload("Product").Preload("CustomProduct").Preload("Sender").First(&message).Error
 	if err != nil {
 		return nil, err
 	}

@@ -11,22 +11,30 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/graph/model"
 	"github.com/jihadable/sticker-be/models"
-	"github.com/jihadable/sticker-be/services"
 	"github.com/jihadable/sticker-be/utils"
 	"github.com/jihadable/sticker-be/utils/mapper"
+	"github.com/jihadable/sticker-be/validators"
 )
 
 // PostUser is the resolver for the post_user field.
 func (r *mutationResolver) PostUser(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
-	user := &models.User{
+	user, err := r.UserService.AddUser(&models.User{
 		Name:     name,
 		Email:    email,
 		Password: password,
 		Phone:    phone,
 		Address:  address,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	user, err := r.UserService.AddUser(user)
+	_, err = r.CartService.AddCart(&models.Cart{CustomerId: user.Id})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = r.ConversationService.AddConversation(&models.Conversation{CustomerId: user.Id})
 	if err != nil {
 		return nil, err
 	}
@@ -41,36 +49,94 @@ func (r *mutationResolver) PostUser(ctx context.Context, name string, email stri
 
 // VerifyUser is the resolver for the verify_user field.
 func (r *mutationResolver) VerifyUser(ctx context.Context, email string, password string) (*model.Auth, error) {
-	return &model.Auth{Token: "", User: &model.User{Email: email}}, nil
-	// panic(fmt.Errorf("not implemented: VerifyUser - verify_user"))
-}
-
-// UpdateUser is the resolver for the update_user field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - update_user"))
-}
-
-// PostProduct is the resolver for the post_product field.
-func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error) {
-	storageService := services.NewStorageService()
-
-	err := storageService.DeleteFile("754efeae-af74-431e-8772-47ed7d9a2bc3.png")
+	user, err := r.UserService.VerifyUser(email, password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Product{ID: "1"}, nil
-	// panic(fmt.Errorf("not implemented: PostProduct - post_product"))
+	token, err := utils.GenerateJWT(user.Id, user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Auth{User: mapper.DBUserToGraphQLUser(user), Token: *token}, nil
+}
+
+// UpdateUser is the resolver for the update_user field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address string) (*model.User, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := r.UserService.UpdateUserById(credit["user_id"], &models.User{
+		Phone:   phone,
+		Address: address,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBUserToGraphQLUser(user), nil
+}
+
+// PostProduct is the resolver for the post_product field.
+func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return nil, err
+	}
+
+	product, err := r.ProductService.AddProduct(&models.Product{
+		Name:        name,
+		Price:       int(price),
+		Stock:       int(stock),
+		Description: description,
+	}, image)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBProductToGraphQLProduct(product), nil
 }
 
 // UpdateProduct is the resolver for the update_product field.
-func (r *mutationResolver) UpdateProduct(ctx context.Context, name string, price int32, stock int32, description string, image *graphql.Upload) (*model.Product, error) {
-	panic(fmt.Errorf("not implemented: UpdateProduct - update_product"))
+func (r *mutationResolver) UpdateProduct(ctx context.Context, id string, name string, price int32, stock int32, description string, image *graphql.Upload) (*model.Product, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return nil, err
+	}
+
+	product, err := r.ProductService.UpdateProductById(id, &models.Product{
+		Name:        name,
+		Price:       int(price),
+		Stock:       int(stock),
+		Description: description,
+	}, image)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBProductToGraphQLProduct(product), nil
 }
 
 // DeleteProduct is the resolver for the delete_product field.
 func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteProduct - delete_product"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return false, err
+	}
+
+	err = r.ProductService.DeleteProductById(id)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // PostCustomProduct is the resolver for the post_custom_product field.
