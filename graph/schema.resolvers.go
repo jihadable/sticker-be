@@ -12,12 +12,31 @@ import (
 	"github.com/jihadable/sticker-be/graph/model"
 	"github.com/jihadable/sticker-be/models"
 	"github.com/jihadable/sticker-be/services"
+	"github.com/jihadable/sticker-be/utils"
 	"github.com/jihadable/sticker-be/utils/mapper"
 )
 
 // PostUser is the resolver for the post_user field.
 func (r *mutationResolver) PostUser(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
-	panic(fmt.Errorf("not implemented: PostUser - post_user"))
+	user := &models.User{
+		Name:     name,
+		Email:    email,
+		Password: password,
+		Phone:    phone,
+		Address:  address,
+	}
+
+	user, err := r.UserService.AddUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := utils.GenerateJWT(user.Id, user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Auth{User: mapper.DBUserToGraphQLUser(user), Token: *token}, nil
 }
 
 // VerifyUser is the resolver for the verify_user field.
