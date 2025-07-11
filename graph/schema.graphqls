@@ -21,9 +21,9 @@ type User {
 	phone: String!
 	address: String!
 
-	# custom_products: [CustomProduct]!
+	custom_products: [CustomProduct]!
 	# cart: Cart
-	# orders: [Order]!
+	orders: [Order]!
 	# conversation: Conversation!
 }
 
@@ -226,7 +226,7 @@ type Mutation {
 	): CartProduct!
 
 	# order
-	post_order(order_items: [OrderItem]!): Order!
+	post_order(order_items: [OrderItem]!, total_price: Int!): Order!
 	update_order(id: ID!, status: String!): Order!
 
 	# message

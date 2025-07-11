@@ -1,4 +1,4 @@
-package main
+package graphql
 
 import (
 	"context"
@@ -16,8 +16,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	err := godotenv.Load(".env.local")
+func TestApp() *fiber.App {
+	err := godotenv.Load("../../.env.local")
 	if err != nil {
 		panic("Failed to read .env file: " + err.Error())
 	}
@@ -56,7 +56,8 @@ func main() {
 		}))(c)
 	})
 
-	// app.Get("/", adaptor.HTTPHandler(playground.Handler("GraphQL Playground", "/graphql")))
-
-	app.Listen(":3000")
+	return app
 }
+
+var App = TestApp()
+var CustomerJWT, AdminJWT string

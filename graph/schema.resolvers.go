@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/graph/model"
@@ -225,27 +224,102 @@ func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool,
 
 // PostCartProduct is the resolver for the post_cart_product field.
 func (r *mutationResolver) PostCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error) {
-	panic(fmt.Errorf("not implemented: PostCartProduct - post_cart_product"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	cartProduct, err := r.CartProductService.AddCartProduct(&models.CartProduct{
+		CartId:          cartID,
+		ProductId:       productID,
+		CustomProductId: customProductID,
+		Quantity:        int(quantity),
+		Size:            string(size),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCartProductToGraphQLCartProduct(cartProduct), nil
 }
 
 // UpdateCartProduct is the resolver for the update_cart_product field.
 func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, quantity int32, size model.Size) (*model.CartProduct, error) {
-	panic(fmt.Errorf("not implemented: UpdateCartProduct - update_cart_product"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	cartProduct, err := r.CartProductService.UpdateCartProductById(id, &models.CartProduct{
+		Quantity: int(quantity),
+		Size:     string(size),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCartProductToGraphQLCartProduct(cartProduct), nil
 }
 
 // PostOrder is the resolver for the post_order field.
-func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.OrderItem) (*model.Order, error) {
-	panic(fmt.Errorf("not implemented: PostOrder - post_order"))
+func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.OrderItem, totalPrice int32) (*model.Order, error) {
+	orderProducts := make([]*models.OrderProduct, len(orderItems))
+	for i, orderItem := range orderItems {
+		orderProducts[i] = &models.OrderProduct{
+			ProductId:       orderItem.ProductID,
+			CustomProductId: orderItem.CustomProductID,
+			Quantity:        int(orderItem.Quantity),
+			Size:            string(orderItem.Size),
+			SubtotalPrice:   int(orderItem.SubtotalPrice),
+		}
+	}
+
+	order, err := r.OrderService.AddOrder(&models.Order{TotalPrice: int(totalPrice)}, orderProducts)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBOrderToGraphQLOrder(order), nil
 }
 
 // UpdateOrder is the resolver for the update_order field.
 func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, status string) (*model.Order, error) {
-	panic(fmt.Errorf("not implemented: UpdateOrder - update_order"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	order, err := r.OrderService.UpdateOrderById(id, &models.Order{Status: status})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBOrderToGraphQLOrder(order), nil
 }
 
 // PostMessage is the resolver for the post_message field.
 func (r *mutationResolver) PostMessage(ctx context.Context, conversationID string, productID *string, customProductID *string, message string) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: PostMessage - post_message"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	newMessage, err := r.MessageService.AddMessage(&models.Message{
+		ConversationId:  conversationID,
+		ProductId:       productID,
+		CustomProductId: customProductID,
+		SenderId:        credit["user_id"],
+		Message:         message,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBMessageToGraphQLMessage(newMessage), nil
 }
 
 // User is the resolver for the user field.
@@ -377,22 +451,71 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, erro
 
 // CartByUser is the resolver for the cart_by_user field.
 func (r *queryResolver) CartByUser(ctx context.Context) (*model.Cart, error) {
-	panic(fmt.Errorf("not implemented: CartByUser - cart_by_user"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	cart, err := r.CartService.GetCartByCustomer(credit["user_id"])
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBCartToGraphQLCart(cart), nil
 }
 
 // Order is the resolver for the order field.
 func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, error) {
-	panic(fmt.Errorf("not implemented: Order - order"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	order, err := r.OrderService.GetOrderById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBOrderToGraphQLOrder(order), nil
 }
 
 // OrdersByUser is the resolver for the orders_by_user field.
 func (r *queryResolver) OrdersByUser(ctx context.Context) ([]*model.Order, error) {
-	panic(fmt.Errorf("not implemented: OrdersByUser - orders_by_user"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	orders, err := r.OrderService.GetOrdersByCustomer(credit["user_id"])
+	if err != nil {
+		return nil, err
+	}
+
+	ordersResponse := make([]*model.Order, len(orders))
+	for i, order := range orders {
+		ordersResponse[i] = mapper.DBOrderToGraphQLOrder(order)
+	}
+
+	return ordersResponse, nil
 }
 
 // ConversationByUser is the resolver for the conversation_by_user field.
 func (r *queryResolver) ConversationByUser(ctx context.Context) (*model.Conversation, error) {
-	panic(fmt.Errorf("not implemented: ConversationByUser - conversation_by_user"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	conversation, err := r.ConversationService.GetConversationByCustomer(credit["user_id"])
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBConversationTOGraphQLConversation(conversation), nil
 }
 
 // Mutation returns MutationResolver implementation.
@@ -403,15 +526,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) Cart(ctx context.Context) (*model.Cart, error) {
-	panic(fmt.Errorf("not implemented: Cart - cart"))
-}
-*/

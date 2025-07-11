@@ -20,7 +20,7 @@ func (service *OrderProductServiceImpl) AddOrderProducts(order_id string, orderP
 		orderProduct.OrderId = order_id
 	}
 
-	err := service.DB.Create(orderProducts).Error
+	err := service.DB.Create(&orderProducts).Error
 	if err != nil {
 		return nil, err
 	}
