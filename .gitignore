@@ -2,3 +2,4 @@
 .env.local
 class.txt
 .DS_Store
+static

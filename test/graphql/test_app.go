@@ -61,3 +61,5 @@ func TestApp() *fiber.App {
 
 var App = TestApp()
 var CustomerJWT, AdminJWT string
+var ProductId, CustomProductId string
+var CategoryId string

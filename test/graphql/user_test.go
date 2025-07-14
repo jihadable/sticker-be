@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -84,7 +83,6 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
-	fmt.Println(responseBody)
 
 	assert.Nil(t, responseBody["data"])
 
@@ -103,7 +101,7 @@ func TestGetUserWithToken(t *testing.T) {
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", CustomerJWT)
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
 	response, err := App.Test(request)
 
@@ -151,7 +149,6 @@ func TestGetUserWithoutToken(t *testing.T) {
 	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
-	fmt.Println(responseBody)
 
 	assert.Nil(t, responseBody["data"])
 
@@ -307,6 +304,34 @@ func TestLoginAsAdmin(t *testing.T) {
 	assert.Equal(t, "sticker admin test", user["name"])
 	assert.Equal(t, "stickeradmin@gmail.com", user["email"])
 	assert.Equal(t, "admin", user["role"])
+
+	t.Log("✅")
+}
+
+func TestLoginWithInvalidPayload(t *testing.T) {
+	requestBody := RequestBodyParser(map[string]string{
+		"query": `mutation {
+			verify_user(){
+				token
+				user { id, name, email, role, phone, address, custom_products, orders }
+			}
+		}`,
+	})
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+
+	response, err := App.Test(request)
+
+	assert.Nil(t, err)
+	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
+
+	responseBody := ResponseBodyParser(response.Body)
+
+	assert.Nil(t, responseBody["data"])
+
+	errors, ok := responseBody["errors"].([]any)
+	assert.True(t, ok)
+	assert.NotEmpty(t, errors)
 
 	t.Log("✅")
 }
