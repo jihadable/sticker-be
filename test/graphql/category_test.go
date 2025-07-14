@@ -15,6 +15,8 @@ func TestCreateCategoryWithValidPayload(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request)
 
@@ -42,6 +44,8 @@ func TestCreateCategoryWithInvalidPayload(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request)
 
@@ -66,6 +70,7 @@ func TestGetCategories(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
 
 	response, err := App.Test(request)
 
@@ -95,6 +100,7 @@ func TestGetCategoryWithValidId(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
 
 	response, err := App.Test(request)
 
@@ -122,6 +128,7 @@ func TestGetCategoryWithInvalidId(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
 
 	response, err := App.Test(request)
 
@@ -146,6 +153,8 @@ func TestDeleteCategory(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request)
 

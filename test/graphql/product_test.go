@@ -230,16 +230,16 @@ func TestUpdateProduct(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postProduct, ok := data["post_product"].(map[string]any)
+	updateProduct, ok := data["update_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, ProductId, postProduct["id"])
-	assert.Equal(t, "update product test", postProduct["name"])
-	assert.Equal(t, 1500, postProduct["price"])
-	assert.Equal(t, 10, postProduct["stock"])
-	assert.NotEmpty(t, postProduct["image_url"])
-	assert.Equal(t, "update desc test", postProduct["description"])
-	assert.Empty(t, postProduct["categories"])
+	assert.Equal(t, ProductId, updateProduct["id"])
+	assert.Equal(t, "update product test", updateProduct["name"])
+	assert.Equal(t, 1500, updateProduct["price"])
+	assert.Equal(t, 10, updateProduct["stock"])
+	assert.NotEmpty(t, updateProduct["image_url"])
+	assert.Equal(t, "update desc test", updateProduct["description"])
+	assert.Empty(t, updateProduct["categories"])
 
 	t.Log("✅")
 }
