@@ -131,7 +131,7 @@ func TestGetProducts(t *testing.T) {
 func TestGetProductWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			product(id: ` + ProductId + `){
+			product(id: "` + ProductId + `"){
 				id, name, price, stock, image_url, description, categories
 			}
 		}`,
@@ -166,7 +166,7 @@ func TestGetProductWithValidId(t *testing.T) {
 func TestGetProductWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			product(id: xxx){ id, name, price, stock, image_url, description, categories }
+			product(id: "xxx"){ id, name, price, stock, image_url, description, categories }
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -247,7 +247,7 @@ func TestUpdateProduct(t *testing.T) {
 func TestDeleteProduct(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			delete_product(id: ` + ProductId + `)
+			delete_product(id: "` + ProductId + `")
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)

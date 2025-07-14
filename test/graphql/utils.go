@@ -17,7 +17,7 @@ func RequestBodyParser(body any) io.Reader {
 	return bytes.NewReader(jsonBody)
 }
 
-func ResponseBodyParser(body io.ReadCloser) fiber.Map {
+func ResponseBodyParser(body io.ReadCloser) map[string]any {
 	defer body.Close()
 
 	result := fiber.Map{}
