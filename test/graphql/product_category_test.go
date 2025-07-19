@@ -8,18 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateProductCategory(t *testing.T) {
+func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			post_product_category(product_id: "` + ProductId + `", category_id: "` + CategoryId + `"){
-				product { id, name, price, stock, image_url, description }, 
+				product { id, name, price, stock, image_url, description },
 				category { id }
 			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer"+AdminJWT)
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request)
 
@@ -52,6 +52,35 @@ func TestCreateProductCategory(t *testing.T) {
 	t.Log("✅")
 }
 
+func TestCreateProductCategoryWithInvalidPayload(t *testing.T) {
+	requestBody := RequestBodyParser(map[string]string{
+		"query": `mutation {
+			post_product_category(){
+				product { id, name, price, stock, image_url, description },
+				category { id }
+			}
+		}`,
+	})
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
+
+	response, err := App.Test(request)
+
+	assert.Nil(t, err)
+	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
+
+	responseBody := ResponseBodyParser(response.Body)
+
+	assert.Nil(t, responseBody["data"])
+
+	errors, ok := responseBody["errors"].([]any)
+	assert.True(t, ok)
+	assert.NotEmpty(t, errors)
+
+	t.Log("✅")
+}
+
 func TestDeleteProductCategory(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
@@ -60,7 +89,7 @@ func TestDeleteProductCategory(t *testing.T) {
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer"+AdminJWT)
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request)
 

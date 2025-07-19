@@ -8,17 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPostMessage(t *testing.T) {
+func TestCreateMessageWithoutReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			post_message(conversation_id: "` + ConversationId + `", message: "test message"){
-				id, message, sender
+				id, message,
+				sender { id, name, email, role, phone, address }
 			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer"+CustomerJWT)
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
 	response, err := App.Test(request)
 
@@ -49,17 +50,47 @@ func TestPostMessage(t *testing.T) {
 	t.Log("✅")
 }
 
-func TestPostMessageWithProductReply(t *testing.T) {
+func TestCreateMessageWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_message(conversation_id: "` + ConversationId + `", product_id: "` + ProductId + `", message: "test message"){
-				id, product, message, sender
+			post_message(){
+				id, message,
+				sender { id, name, email, role, phone, address }
 			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer"+CustomerJWT)
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
+
+	response, err := App.Test(request)
+
+	assert.Nil(t, err)
+	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
+
+	responseBody := ResponseBodyParser(response.Body)
+
+	assert.Nil(t, responseBody["data"])
+
+	errors, ok := responseBody["errors"].([]any)
+	assert.True(t, ok)
+	assert.NotEmpty(t, errors)
+
+	t.Log("✅")
+}
+
+func TestCreateMessageWithProductReply(t *testing.T) {
+	requestBody := RequestBodyParser(map[string]string{
+		"query": `mutation {
+			post_message(conversation_id: "` + ConversationId + `", product_id: "` + ProductId + `", message: "test message"){
+				id, product, message,
+				sender { id, name, email, role, phone, address }
+			}
+		}`,
+	})
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
 	response, err := App.Test(request)
 
@@ -100,7 +131,7 @@ func TestPostMessageWithProductReply(t *testing.T) {
 	t.Log("✅")
 }
 
-func TestPostMessageWithCustomProductReply(t *testing.T) {
+func TestCreateMessageWithCustomProductReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			post_message(conversation_id: "` + ConversationId + `", custom_product_id: "` + CustomProductId + `", message: "test message"){
@@ -111,7 +142,7 @@ func TestPostMessageWithCustomProductReply(t *testing.T) {
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer"+CustomerJWT)
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
 	response, err := App.Test(request)
 
