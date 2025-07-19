@@ -44,6 +44,7 @@ func DB() *gorm.DB {
 		&models.OrderProduct{},
 		&models.Conversation{},
 		&models.Message{},
+		&models.Notification{},
 	)
 	db.AutoMigrate(
 		&models.User{},
@@ -57,6 +58,7 @@ func DB() *gorm.DB {
 		&models.OrderProduct{},
 		&models.Conversation{},
 		&models.Message{},
+		&models.Notification{},
 	)
 
 	return db

@@ -18,8 +18,8 @@ type User {
 	email: String!
 	# password: String!
 	role: Role!
-	phone: String!
-	address: String!
+	phone: String
+	address: String
 
 	custom_products: [CustomProduct]!
 	# cart: Cart

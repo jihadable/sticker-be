@@ -11,7 +11,9 @@ import (
 func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_category(id: "cat"){ id, products }
+			post_category(id: "test category"){
+				id, products { id, name, price, stock, image_url, description }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -31,7 +33,7 @@ func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	postCategory, ok := data["post_category"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, "cat", postCategory["id"])
+	assert.Equal(t, "test category", postCategory["id"])
 	CategoryId = postCategory["id"].(string)
 	assert.Empty(t, postCategory["products"])
 
@@ -41,7 +43,9 @@ func TestCreateCategoryWithValidPayload1(t *testing.T) {
 func TestCreateCategoryWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_category(){ id, products }
+			post_category(){
+				id, products { id, name, price, stock, image_url, description }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -67,7 +71,9 @@ func TestCreateCategoryWithInvalidPayload(t *testing.T) {
 func TestGetCategories(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"qeury": `mutation {
-			categories { id, products }
+			categories {
+				id, products { id, name, price, stock, image_url, description }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -96,7 +102,9 @@ func TestGetCategories(t *testing.T) {
 func TestGetCategoryWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			category(id: "` + CategoryId + `"){ id, products }
+			category(id: "` + CategoryId + `"){
+				id, products { id, name, price, stock, image_url, description }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -124,7 +132,9 @@ func TestGetCategoryWithValidId(t *testing.T) {
 func TestGetCategoryWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			category(id: "xxx"){ id, products }
+			category(id: "xxx"){
+				id, products { id, name, price, stock, image_url, description }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -176,7 +186,9 @@ func TestDeleteCategory(t *testing.T) {
 func TestCreateCategoryWithValidPayload2(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_category(id: "cat"){ id, products }
+			post_category(id: "test category"){
+				id, products { id, name, price, stock, image_url, description }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -196,7 +208,7 @@ func TestCreateCategoryWithValidPayload2(t *testing.T) {
 	postCategory, ok := data["post_category"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, "cat", postCategory["id"])
+	assert.Equal(t, "test category", postCategory["id"])
 	CategoryId = postCategory["id"].(string)
 	assert.Empty(t, postCategory["products"])
 

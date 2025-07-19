@@ -107,8 +107,8 @@ type User struct {
 	Name           string           `json:"name"`
 	Email          string           `json:"email"`
 	Role           Role             `json:"role"`
-	Phone          string           `json:"phone"`
-	Address        string           `json:"address"`
+	Phone          *string          `json:"phone,omitempty"`
+	Address        *string          `json:"address,omitempty"`
 	CustomProducts []*CustomProduct `json:"custom_products"`
 	Orders         []*Order         `json:"orders"`
 }

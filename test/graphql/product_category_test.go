@@ -12,7 +12,8 @@ func TestCreateProductCategory(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			post_product_category(product_id: "` + ProductId + `", category_id: "` + CategoryId + `"){
-				product, category
+				product { id, name, price, stock, image_url, description }, 
+				category { id }
 			}
 		}`,
 	})

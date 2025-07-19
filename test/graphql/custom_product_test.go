@@ -24,7 +24,7 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url }}",
+		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
 		"variables": {
 			"image": null
 		}
@@ -61,13 +61,26 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 	assert.Equal(t, "custom product test", postCustomProduct["name"])
 	assert.NotEmpty(t, postCustomProduct["image_url"])
 
+	customer, ok := postCustomProduct["customer"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, customer["id"])
+	assert.NotEmpty(t, customer["name"])
+	assert.NotEmpty(t, customer["email"])
+	assert.NotEmpty(t, customer["role"])
+	assert.NotEmpty(t, customer["phone"])
+	assert.NotEmpty(t, customer["address"])
+
 	t.Log("✅")
 }
 
 func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_custom_product(){ id, name, image_url }
+			post_custom_product(){
+				id, name, image_url,
+				customer { id, name, email, role, phone, address }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -93,7 +106,10 @@ func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 func TestGetCustomProductsByUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			custom_products_by_user { id, name, image_url }
+			custom_products_by_user {
+				id, name, image_url, 
+				customer { id, name, email, role, phone, address }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -118,13 +134,26 @@ func TestGetCustomProductsByUser(t *testing.T) {
 	assert.NotEmpty(t, customProduct["name"])
 	assert.NotEmpty(t, customProduct["image_url"])
 
+	customer, ok := customProduct["customer"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, customer["id"])
+	assert.NotEmpty(t, customer["name"])
+	assert.NotEmpty(t, customer["email"])
+	assert.NotEmpty(t, customer["role"])
+	assert.NotEmpty(t, customer["phone"])
+	assert.NotEmpty(t, customer["address"])
+
 	t.Log("✅")
 }
 
 func TestGetCustomProductWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			custom_product(id: "` + CustomProductId + `"){ id, name, image_url }
+			custom_product(id: "` + CustomProductId + `"){
+				id, name, image_url,
+				customer { id, name, email, role, phone, address }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -148,13 +177,26 @@ func TestGetCustomProductWithValidId(t *testing.T) {
 	assert.Equal(t, "custom product test", customProduct["name"])
 	assert.NotEmpty(t, customProduct["image_url"])
 
+	customer, ok := customProduct["customer"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, customer["id"])
+	assert.NotEmpty(t, customer["name"])
+	assert.NotEmpty(t, customer["email"])
+	assert.NotEmpty(t, customer["role"])
+	assert.NotEmpty(t, customer["phone"])
+	assert.NotEmpty(t, customer["address"])
+
 	t.Log("✅")
 }
 
 func TestGetCustomProductWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			custom_product(id: "xxx"){ id, name, image_url }
+			custom_product(id: "xxx"){
+				id, name, image_url,
+				customer { id, name, email, role, phone, address }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -188,7 +230,7 @@ func TestUpdateCustomProduct(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($id: ID!, $image: Upload!){ update_custom_product(id: $id, name: \"update custom product test\", image: $image){ id, name, image_url }}",
+		"query": "mutation($id: ID!, $image: Upload!){ update_custom_product(id: $id, name: \"update custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
 		"variables": {
 			"id": null,
 			"image": null
@@ -225,6 +267,16 @@ func TestUpdateCustomProduct(t *testing.T) {
 	assert.Equal(t, ProductId, updateCustomProduct["id"])
 	assert.Equal(t, "update custom product test", updateCustomProduct["name"])
 	assert.NotEmpty(t, updateCustomProduct["image_url"])
+
+	customer, ok := updateCustomProduct["customer"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, customer["id"])
+	assert.NotEmpty(t, customer["name"])
+	assert.NotEmpty(t, customer["email"])
+	assert.NotEmpty(t, customer["role"])
+	assert.NotEmpty(t, customer["phone"])
+	assert.NotEmpty(t, customer["address"])
 
 	t.Log("✅")
 }
@@ -267,7 +319,7 @@ func TestCreateCustomProductWithValidPayload2(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url }}",
+		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
 		"variables": {
 			"image": null
 		}
@@ -303,6 +355,16 @@ func TestCreateCustomProductWithValidPayload2(t *testing.T) {
 	CustomProductId = postCustomProduct["id"].(string)
 	assert.Equal(t, "custom product test", postCustomProduct["name"])
 	assert.NotEmpty(t, postCustomProduct["image_url"])
+
+	customer, ok := postCustomProduct["customer"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, customer["id"])
+	assert.NotEmpty(t, customer["name"])
+	assert.NotEmpty(t, customer["email"])
+	assert.NotEmpty(t, customer["role"])
+	assert.NotEmpty(t, customer["phone"])
+	assert.NotEmpty(t, customer["address"])
 
 	t.Log("✅")
 }

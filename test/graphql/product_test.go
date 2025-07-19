@@ -24,7 +24,7 @@ func TestPostProductWithValidPayload1(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories }}",
+		"query": "mutation($image: Upload!){ post_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
 		"variables": {
 			"image": null
 		}
@@ -71,7 +71,10 @@ func TestPostProductWithValidPayload1(t *testing.T) {
 func TestPostProductWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_product(){ id, name, price, stock, image_url, description, categories }	
+			post_product(){
+				id, name, price, stock, image_url, description,
+				categories { id }
+			}	
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -97,7 +100,10 @@ func TestPostProductWithInvalidPayload(t *testing.T) {
 func TestGetProducts(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			products { id, name, price, stock, image_url, description, categories }	
+			products {
+				id, name, price, stock, image_url, description, 
+				categories { id }
+			}	
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -132,7 +138,8 @@ func TestGetProductWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
 			product(id: "` + ProductId + `"){
-				id, name, price, stock, image_url, description, categories
+				id, name, price, stock, image_url, description,
+				categories { id }
 			}
 		}`,
 	})
@@ -166,7 +173,10 @@ func TestGetProductWithValidId(t *testing.T) {
 func TestGetProductWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			product(id: "xxx"){ id, name, price, stock, image_url, description, categories }
+			product(id: "xxx"){
+				id, name, price, stock, image_url, description,
+				categories { id }
+			}
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -199,7 +209,7 @@ func TestUpdateProduct(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($id: ID!, $image: Upload!){ update_product(id: $id, name: \"update product test\", price: 1500, stock: 10, description: \"update desc test\", image: $image){ id, name, price, stock, image_url, description, categories }}",
+		"query": "mutation($id: ID!, $image: Upload!){ update_product(id: $id, name: \"update product test\", price: 1500, stock: 10, description: \"update desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
 		"variables": {
 			"id": null,
 			"image": null
@@ -280,7 +290,7 @@ func TestPostProductWithValidPayload2(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories }}",
+		"query": "mutation($image: Upload!){ post_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
 		"variables": {
 			"image": null
 		}

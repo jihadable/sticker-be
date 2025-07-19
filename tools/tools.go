@@ -8,6 +8,7 @@ import (
 	_ "github.com/golang-jwt/jwt/v5"
 	_ "github.com/google/uuid"
 	_ "github.com/joho/godotenv"
+	_ "github.com/pusher/pusher-http-go/v5"
 	_ "github.com/redis/go-redis/v9"
 	_ "github.com/stretchr/testify"
 	_ "github.com/stretchr/testify/assert"

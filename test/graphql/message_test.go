@@ -104,7 +104,8 @@ func TestPostMessageWithCustomProductReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			post_message(conversation_id: "` + ConversationId + `", custom_product_id: "` + CustomProductId + `", message: "test message"){
-				id, custom_product, message, sender
+				id, custom_product, message, 
+				sender { id, name, email, role, phone, address }
 			}
 		}`,
 	})

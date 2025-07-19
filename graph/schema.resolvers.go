@@ -21,8 +21,8 @@ func (r *mutationResolver) PostUser(ctx context.Context, name string, email stri
 		Name:     name,
 		Email:    email,
 		Password: password,
-		Phone:    phone,
-		Address:  address,
+		Phone:    &phone,
+		Address:  &address,
 	})
 	if err != nil {
 		return nil, err
@@ -70,8 +70,8 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address
 	}
 
 	user, err := r.UserService.UpdateUserById(credit["user_id"], &models.User{
-		Phone:   phone,
-		Address: address,
+		Phone:   &phone,
+		Address: &address,
 	})
 	if err != nil {
 		return nil, err

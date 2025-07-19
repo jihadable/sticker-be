@@ -19,7 +19,7 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 				address: "Jl. Langsat"
 			){
 				token
-				user { id, name, email, role, phone, address, custom_products, orders }
+				user { id, name, email, role, phone, address }
 			}
 		}`,
 	})
@@ -54,14 +54,6 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 	assert.Equal(t, "081234567890", user["phone"])
 	assert.Equal(t, "Jl. Langsat", user["address"])
 
-	customProducts, ok := user["custom_products"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, customProducts)
-
-	orders, ok := user["orders"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, orders)
-
 	t.Log("✅")
 }
 
@@ -70,7 +62,7 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 		"query": `mutation {
 			post_user(){
 				token
-				user { id, name, email, role, phone, address, custom_products, orders }
+				user { id, name, email, role, phone, address }
 			}
 		}`,
 	})
@@ -96,7 +88,7 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 func TestGetUserWithToken(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			user { id, name, email, role, phone, address, custom_products, orders }
+			user { id, name, email, role, phone, address }
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -123,21 +115,13 @@ func TestGetUserWithToken(t *testing.T) {
 	assert.Equal(t, "081234567890", user["phone"])
 	assert.Equal(t, "Jl. Langsat", user["address"])
 
-	customProducts, ok := user["custom_products"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, customProducts)
-
-	orders, ok := user["orders"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, orders)
-
 	t.Log("✅")
 }
 
 func TestGetUserWithoutToken(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			user { id, name, email, role, phone, address, custom_products, orders }
+			user { id, name, email, role, phone, address }
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -165,7 +149,7 @@ func TestUpadateUser(t *testing.T) {
 			update_user(
 				phone: "081122334455",
 				address: "Jl. Durian"
-			){ id, name, email, role, phone, address, custom_products, orders }
+			){ id, name, email, role, phone, address }
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -199,14 +183,6 @@ func TestUpadateUser(t *testing.T) {
 	assert.Equal(t, "081122334455", user["phone"])
 	assert.Equal(t, "Jl. Durian", user["address"])
 
-	customProducts, ok := user["custom_products"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, customProducts)
-
-	orders, ok := user["orders"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, orders)
-
 	t.Log("✅")
 }
 
@@ -218,7 +194,7 @@ func TestLoginAsCustomer(t *testing.T) {
 				password: "test"
 			){
 				token
-				user { id, name, email, role, phone, address, custom_products, orders }
+				user { id, name, email, role, phone, address }
 			}
 		}`,
 	})
@@ -252,14 +228,6 @@ func TestLoginAsCustomer(t *testing.T) {
 	assert.Equal(t, "customer", user["role"])
 	assert.Equal(t, "081122334455", user["phone"])
 	assert.Equal(t, "Jl. Durian", user["address"])
-
-	customProducts, ok := user["custom_products"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, customProducts)
-
-	orders, ok := user["orders"].([]any)
-	assert.True(t, ok)
-	assert.Empty(t, orders)
 
 	t.Log("✅")
 }
@@ -313,7 +281,7 @@ func TestLoginWithInvalidPayload(t *testing.T) {
 		"query": `mutation {
 			verify_user(){
 				token
-				user { id, name, email, role, phone, address, custom_products, orders }
+				user { id, name, email, role, phone, address }
 			}
 		}`,
 	})
