@@ -6,10 +6,11 @@ import (
 )
 
 type Notification struct {
-	Id          string `gorm:"column:id;primaryKey" json:"id"`
-	UserId      string `gorm:"column:user_id" json:"user_id"`
-	Title       string `gorm:"column:title" json:"title"`
-	Description string `gorm:"column:description" json:"description"`
+	Id      string `gorm:"column:id;primaryKey" json:"id"`
+	UserId  string `gorm:"column:user_id" json:"user_id"`
+	Title   string `gorm:"column:title" json:"title"`
+	Message string `gorm:"column:message" json:"message"`
+	IsRead  bool   `gorm:"column:is_read" json:"is_read"`
 
 	User *User `gorm:"foreignKey:UserId;references:Id" json:"user"`
 }
