@@ -64,7 +64,7 @@ func (r *mutationResolver) VerifyUser(ctx context.Context, email string, passwor
 // UpdateUser is the resolver for the update_user field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address string) (*model.User, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -222,10 +222,45 @@ func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool,
 	return true, nil
 }
 
+// PostProductCategory is the resolver for the post_product_category field.
+func (r *mutationResolver) PostProductCategory(ctx context.Context, productID string, categoryID string) (*model.ProductCategory, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return nil, err
+	}
+
+	productCategory, err := r.ProductCategoryService.AddProductCategory(&models.ProductCategory{
+		ProductId:  productID,
+		CategoryId: categoryID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.DBProductCategoryToGraphQLProductCategory(productCategory), nil
+}
+
+// DeleteProductCategory is the resolver for the delete_product_category field.
+func (r *mutationResolver) DeleteProductCategory(ctx context.Context, productID string, categoryID string) (bool, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
+	if err != nil {
+		return false, err
+	}
+
+	err = r.ProductCategoryService.DeleteProductCategory(productID, categoryID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // PostCartProduct is the resolver for the post_cart_product field.
 func (r *mutationResolver) PostCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +282,7 @@ func (r *mutationResolver) PostCartProduct(ctx context.Context, cartID string, p
 // UpdateCartProduct is the resolver for the update_cart_product field.
 func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, quantity int32, size model.Size) (*model.CartProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -265,6 +300,12 @@ func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, qua
 
 // PostOrder is the resolver for the post_order field.
 func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.OrderItem, totalPrice int32) (*model.Order, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
+	if err != nil {
+		return nil, err
+	}
+
 	orderProducts := make([]*models.OrderProduct, len(orderItems))
 	for i, orderItem := range orderItems {
 		orderProducts[i] = &models.OrderProduct{
@@ -276,7 +317,10 @@ func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.Or
 		}
 	}
 
-	order, err := r.OrderService.AddOrder(&models.Order{TotalPrice: int(totalPrice)}, orderProducts)
+	order, err := r.OrderService.AddOrder(&models.Order{
+		CustomerId: credit["user_id"],
+		TotalPrice: int(totalPrice),
+	}, orderProducts)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +331,7 @@ func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.Or
 // UpdateOrder is the resolver for the update_order field.
 func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, status string) (*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +347,7 @@ func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, status st
 // PostMessage is the resolver for the post_message field.
 func (r *mutationResolver) PostMessage(ctx context.Context, conversationID string, productID *string, customProductID *string, message string) (*model.Message, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.AuthValidator(authHeader, r.UserService)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +369,7 @@ func (r *mutationResolver) PostMessage(ctx context.Context, conversationID strin
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.AuthValidator(authHeader, r.UserService)
 	if err != nil {
 		return nil, err
 	}
@@ -340,12 +384,6 @@ func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
 
 // Product is the resolver for the product field.
 func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product, error) {
-	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	product, err := r.ProductService.GetProductById(id)
 	if err != nil {
 		return nil, err
@@ -356,12 +394,6 @@ func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product,
 
 // Products is the resolver for the products field.
 func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) {
-	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	products, err := r.ProductService.GetProducts()
 	if err != nil {
 		return nil, err
@@ -378,7 +410,7 @@ func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) 
 // CustomProduct is the resolver for the custom_product field.
 func (r *queryResolver) CustomProduct(ctx context.Context, id string) (*model.CustomProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +426,7 @@ func (r *queryResolver) CustomProduct(ctx context.Context, id string) (*model.Cu
 // CustomProductsByUser is the resolver for the custom_products_by_user field.
 func (r *queryResolver) CustomProductsByUser(ctx context.Context) ([]*model.CustomProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -414,12 +446,6 @@ func (r *queryResolver) CustomProductsByUser(ctx context.Context) ([]*model.Cust
 
 // Category is the resolver for the category field.
 func (r *queryResolver) Category(ctx context.Context, id string) (*model.Category, error) {
-	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	category, err := r.CategoryService.GetCategoryById(id)
 	if err != nil {
 		return nil, err
@@ -430,12 +456,6 @@ func (r *queryResolver) Category(ctx context.Context, id string) (*model.Categor
 
 // Categories is the resolver for the categories field.
 func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
-	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	categories, err := r.CategoryService.GetCategories()
 	if err != nil {
 		return nil, err
@@ -452,7 +472,7 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, erro
 // CartByUser is the resolver for the cart_by_user field.
 func (r *queryResolver) CartByUser(ctx context.Context) (*model.Cart, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +488,7 @@ func (r *queryResolver) CartByUser(ctx context.Context) (*model.Cart, error) {
 // Order is the resolver for the order field.
 func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.AuthValidator(authHeader, nil)
+	_, err := validators.AuthValidator(authHeader, r.UserService)
 	if err != nil {
 		return nil, err
 	}
@@ -484,7 +504,7 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, err
 // OrdersByUser is the resolver for the orders_by_user field.
 func (r *queryResolver) OrdersByUser(ctx context.Context) ([]*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
@@ -505,7 +525,7 @@ func (r *queryResolver) OrdersByUser(ctx context.Context) ([]*model.Order, error
 // ConversationByUser is the resolver for the conversation_by_user field.
 func (r *queryResolver) ConversationByUser(ctx context.Context) (*model.Conversation, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	credit, err := validators.AuthValidator(authHeader, nil)
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}

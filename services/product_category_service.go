@@ -22,12 +22,12 @@ func (service *ProductCategoryServiceImpl) AddProductCategory(productCategory *m
 		return nil, err
 	}
 
-	return productCategory, nil
+	return service.GetProductCategory(productCategory.ProductId, productCategory.CategoryId)
 }
 
 func (service *ProductCategoryServiceImpl) GetProductCategory(product_id, category_id string) (*models.ProductCategory, error) {
 	productCategory := models.ProductCategory{}
-	err := service.DB.Where("product_id = ? AND category_id = ?", product_id, category_id).First(&productCategory).Error
+	err := service.DB.Where("product_id = ? AND category_id = ?", product_id, category_id).Preload("Product").Preload("Category").First(&productCategory).Error
 	if err != nil {
 		return nil, err
 	}

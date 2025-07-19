@@ -211,6 +211,10 @@ type Mutation {
 	post_category(id: ID!): Category!
 	delete_category(id: ID!): Boolean!
 
+	# product_category
+	post_product_category(product_id: ID!, category_id: ID!): ProductCategory!
+	delete_product_category(product_id: ID!, category_id: ID!): Boolean! 
+
 	# cart_product
 	post_cart_product(
 		cart_id: ID!

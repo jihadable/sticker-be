@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateCategoryWithValidPayload(t *testing.T) {
+func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			post_category(id: "cat"){ id, products }
@@ -32,6 +32,7 @@ func TestCreateCategoryWithValidPayload(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, "cat", postCategory["id"])
+	CategoryId = postCategory["id"].(string)
 	assert.Empty(t, postCategory["products"])
 
 	t.Log("✅")
@@ -87,7 +88,6 @@ func TestGetCategories(t *testing.T) {
 
 	category := categories[0]
 	assert.NotEmpty(t, category["id"])
-	CategoryId = category["id"].(string)
 	assert.Empty(t, category["products"])
 
 	t.Log("✅")
@@ -169,6 +169,36 @@ func TestDeleteCategory(t *testing.T) {
 	deleteCategory, ok := data["delete_category"].(bool)
 	assert.True(t, ok)
 	assert.True(t, deleteCategory)
+
+	t.Log("✅")
+}
+
+func TestCreateCategoryWithValidPayload2(t *testing.T) {
+	requestBody := RequestBodyParser(map[string]string{
+		"query": `mutation {
+			post_category(id: "cat"){ id, products }
+		}`,
+	})
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
+
+	response, err := App.Test(request)
+
+	assert.Nil(t, err)
+	assert.Equal(t, fiber.StatusOK, response.StatusCode)
+
+	responseBody := ResponseBodyParser(response.Body)
+
+	data, ok := responseBody["data"].(map[string]any)
+	assert.True(t, ok)
+
+	postCategory, ok := data["post_category"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.Equal(t, "cat", postCategory["id"])
+	CategoryId = postCategory["id"].(string)
+	assert.Empty(t, postCategory["products"])
 
 	t.Log("✅")
 }

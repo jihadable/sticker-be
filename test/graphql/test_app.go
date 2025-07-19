@@ -63,3 +63,4 @@ var App = TestApp()
 var CustomerJWT, AdminJWT string
 var ProductId, CustomProductId string
 var CategoryId string
+var ConversationId string

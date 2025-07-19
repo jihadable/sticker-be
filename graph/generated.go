@@ -94,22 +94,24 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		DeleteCategory      func(childComplexity int, id string) int
-		DeleteCustomProduct func(childComplexity int, id string) int
-		DeleteProduct       func(childComplexity int, id string) int
-		PostCartProduct     func(childComplexity int, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) int
-		PostCategory        func(childComplexity int, id string) int
-		PostCustomProduct   func(childComplexity int, name string, image graphql.Upload) int
-		PostMessage         func(childComplexity int, conversationID string, productID *string, customProductID *string, message string) int
-		PostOrder           func(childComplexity int, orderItems []*model.OrderItem, totalPrice int32) int
-		PostProduct         func(childComplexity int, name string, price int32, stock int32, description string, image graphql.Upload) int
-		PostUser            func(childComplexity int, name string, email string, password string, phone string, address string) int
-		UpdateCartProduct   func(childComplexity int, id string, quantity int32, size model.Size) int
-		UpdateCustomProduct func(childComplexity int, id string, name string, image *graphql.Upload) int
-		UpdateOrder         func(childComplexity int, id string, status string) int
-		UpdateProduct       func(childComplexity int, id string, name string, price int32, stock int32, description string, image *graphql.Upload) int
-		UpdateUser          func(childComplexity int, phone string, address string) int
-		VerifyUser          func(childComplexity int, email string, password string) int
+		DeleteCategory        func(childComplexity int, id string) int
+		DeleteCustomProduct   func(childComplexity int, id string) int
+		DeleteProduct         func(childComplexity int, id string) int
+		DeleteProductCategory func(childComplexity int, productID string, categoryID string) int
+		PostCartProduct       func(childComplexity int, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) int
+		PostCategory          func(childComplexity int, id string) int
+		PostCustomProduct     func(childComplexity int, name string, image graphql.Upload) int
+		PostMessage           func(childComplexity int, conversationID string, productID *string, customProductID *string, message string) int
+		PostOrder             func(childComplexity int, orderItems []*model.OrderItem, totalPrice int32) int
+		PostProduct           func(childComplexity int, name string, price int32, stock int32, description string, image graphql.Upload) int
+		PostProductCategory   func(childComplexity int, productID string, categoryID string) int
+		PostUser              func(childComplexity int, name string, email string, password string, phone string, address string) int
+		UpdateCartProduct     func(childComplexity int, id string, quantity int32, size model.Size) int
+		UpdateCustomProduct   func(childComplexity int, id string, name string, image *graphql.Upload) int
+		UpdateOrder           func(childComplexity int, id string, status string) int
+		UpdateProduct         func(childComplexity int, id string, name string, price int32, stock int32, description string, image *graphql.Upload) int
+		UpdateUser            func(childComplexity int, phone string, address string) int
+		VerifyUser            func(childComplexity int, email string, password string) int
 	}
 
 	Order struct {
@@ -183,6 +185,8 @@ type MutationResolver interface {
 	DeleteCustomProduct(ctx context.Context, id string) (bool, error)
 	PostCategory(ctx context.Context, id string) (*model.Category, error)
 	DeleteCategory(ctx context.Context, id string) (bool, error)
+	PostProductCategory(ctx context.Context, productID string, categoryID string) (*model.ProductCategory, error)
+	DeleteProductCategory(ctx context.Context, productID string, categoryID string) (bool, error)
 	PostCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error)
 	UpdateCartProduct(ctx context.Context, id string, quantity int32, size model.Size) (*model.CartProduct, error)
 	PostOrder(ctx context.Context, orderItems []*model.OrderItem, totalPrice int32) (*model.Order, error)
@@ -433,6 +437,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteProduct(childComplexity, args["id"].(string)), true
 
+	case "Mutation.delete_product_category":
+		if e.complexity.Mutation.DeleteProductCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_delete_product_category_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteProductCategory(childComplexity, args["product_id"].(string), args["category_id"].(string)), true
+
 	case "Mutation.post_cart_product":
 		if e.complexity.Mutation.PostCartProduct == nil {
 			break
@@ -504,6 +520,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.PostProduct(childComplexity, args["name"].(string), args["price"].(int32), args["stock"].(int32), args["description"].(string), args["image"].(graphql.Upload)), true
+
+	case "Mutation.post_product_category":
+		if e.complexity.Mutation.PostProductCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_post_product_category_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PostProductCategory(childComplexity, args["product_id"].(string), args["category_id"].(string)), true
 
 	case "Mutation.post_user":
 		if e.complexity.Mutation.PostUser == nil {
@@ -1083,6 +1111,47 @@ func (ec *executionContext) field_Mutation_delete_product_argsID(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_delete_product_category_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_delete_product_category_argsProductID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["product_id"] = arg0
+	arg1, err := ec.field_Mutation_delete_product_category_argsCategoryID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["category_id"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_delete_product_category_argsProductID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("product_id"))
+	if tmp, ok := rawArgs["product_id"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_delete_product_category_argsCategoryID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("category_id"))
+	if tmp, ok := rawArgs["category_id"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_post_cart_product_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1452,6 +1521,47 @@ func (ec *executionContext) field_Mutation_post_product_argsImage(
 	}
 
 	var zeroVal graphql.Upload
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_post_product_category_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_post_product_category_argsProductID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["product_id"] = arg0
+	arg1, err := ec.field_Mutation_post_product_category_argsCategoryID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["category_id"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_post_product_category_argsProductID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("product_id"))
+	if tmp, ok := rawArgs["product_id"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_post_product_category_argsCategoryID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("category_id"))
+	if tmp, ok := rawArgs["category_id"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
 	return zeroVal, nil
 }
 
@@ -4088,6 +4198,122 @@ func (ec *executionContext) fieldContext_Mutation_delete_category(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_delete_category_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_post_product_category(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_post_product_category(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PostProductCategory(rctx, fc.Args["product_id"].(string), fc.Args["category_id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProductCategory)
+	fc.Result = res
+	return ec.marshalNProductCategory2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐProductCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_post_product_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "product":
+				return ec.fieldContext_ProductCategory_product(ctx, field)
+			case "category":
+				return ec.fieldContext_ProductCategory_category(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductCategory", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_post_product_category_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_delete_product_category(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_delete_product_category(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteProductCategory(rctx, fc.Args["product_id"].(string), fc.Args["category_id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_delete_product_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_delete_product_category_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -9064,6 +9290,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "post_product_category":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_post_product_category(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "delete_product_category":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_delete_product_category(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "post_cart_product":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_post_cart_product(ctx, field)
@@ -10418,6 +10658,20 @@ func (ec *executionContext) marshalNProduct2ᚖgithubᚗcomᚋjihadableᚋsticke
 		return graphql.Null
 	}
 	return ec._Product(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductCategory2githubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐProductCategory(ctx context.Context, sel ast.SelectionSet, v model.ProductCategory) graphql.Marshaler {
+	return ec._ProductCategory(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProductCategory2ᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐProductCategory(ctx context.Context, sel ast.SelectionSet, v *model.ProductCategory) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProductCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐRole(ctx context.Context, v any) (model.Role, error) {

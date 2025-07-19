@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateCustomProductWithValidPayload(t *testing.T) {
+func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 	filePath := filepath.Join("..", "..", "static", "redis.png")
 	file, err := os.Open(filePath)
 	assert.Nil(t, err)
@@ -252,6 +252,57 @@ func TestDeleteCustomProduct(t *testing.T) {
 	deleteProduct, ok := data["delete_category"].(bool)
 	assert.True(t, ok)
 	assert.True(t, deleteProduct)
+
+	t.Log("✅")
+}
+
+func TestCreateCustomProductWithValidPayload2(t *testing.T) {
+	filePath := filepath.Join("..", "..", "static", "redis.png")
+	file, err := os.Open(filePath)
+	assert.Nil(t, err)
+	defer file.Close()
+
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	operations := `
+	{
+		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url }}",
+		"variables": {
+			"image": null
+		}
+	}`
+	_ = writer.WriteField("operations", operations)
+	_ = writer.WriteField("map", `{ "0": ["variables.image"] }`)
+
+	part, err := writer.CreateFormFile("0", filepath.Base(filePath))
+	assert.Nil(t, err)
+	_, err = io.Copy(part, file)
+	assert.Nil(t, err)
+
+	writer.Close()
+
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", &requestBody)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
+
+	response, err := App.Test(request)
+
+	assert.Nil(t, err)
+	assert.Equal(t, fiber.StatusOK, response.StatusCode)
+
+	responseBody := ResponseBodyParser(response.Body)
+
+	data, ok := responseBody["data"].(map[string]any)
+	assert.True(t, ok)
+
+	postCustomProduct, ok := data["post_custom_product"].(map[string]any)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, postCustomProduct["id"])
+	CustomProductId = postCustomProduct["id"].(string)
+	assert.Equal(t, "custom product test", postCustomProduct["name"])
+	assert.NotEmpty(t, postCustomProduct["image_url"])
 
 	t.Log("✅")
 }
