@@ -11,17 +11,23 @@ import (
 )
 
 type NotificationService interface {
-	AddNotification(notification *models.Notification) (*models.Notification, error)
+	AddNotification(notification *models.Notification, recipientIds ...string) (*models.Notification, error)
 	GetNotificationById(id string) (*models.Notification, error)
 }
 
 type NotificationServiceImpl struct {
 	DB    *gorm.DB
 	Redis *redis.Client
+	NotificationRecipientService
 }
 
-func (service *NotificationServiceImpl) AddNotification(notification *models.Notification) (*models.Notification, error) {
+func (service *NotificationServiceImpl) AddNotification(notification *models.Notification, recipientIds ...string) (*models.Notification, error) {
 	err := service.DB.Create(notification).Error
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = service.NotificationRecipientService.AddNotificationRecipients(notification.Id, recipientIds...)
 	if err != nil {
 		return nil, err
 	}

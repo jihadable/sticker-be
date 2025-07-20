@@ -13,6 +13,7 @@ import (
 type UserService interface {
 	AddUser(user *models.User) (*models.User, error)
 	GetUserById(id string) (*models.User, error)
+	GetAdmin() (*models.User, error)
 	UpdateUserById(id string, updatedUser *models.User) (*models.User, error)
 	VerifyUser(email string, password string) (*models.User, error)
 }
@@ -42,6 +43,17 @@ func (service *UserServiceImpl) GetUserById(id string) (*models.User, error) {
 	user := models.User{}
 
 	err := service.DB.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (service *UserServiceImpl) GetAdmin() (*models.User, error) {
+	user := models.User{}
+
+	err := service.DB.Where("role = ?", "admin").First(&user).Error
 	if err != nil {
 		return nil, err
 	}

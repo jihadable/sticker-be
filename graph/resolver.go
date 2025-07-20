@@ -18,4 +18,6 @@ type Resolver struct {
 	services.OrderProductService
 	services.ConversationService
 	services.MessageService
+	services.NotificationService
+	services.NotificationRecipientService
 }

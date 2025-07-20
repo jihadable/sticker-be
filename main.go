@@ -30,17 +30,19 @@ func main() {
 
 	app.All("/graphql", func(c *fiber.Ctx) error {
 		handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-			UserService:            services.NewUserService(db, redis),
-			ProductService:         services.NewProductService(db, redis),
-			CustomProductService:   services.NewCustomProductService(db, redis),
-			CategoryService:        services.NewCategoryService(db, redis),
-			ProductCategoryService: services.NewProductCategoryService(db, redis),
-			CartService:            services.NewCartService(db, redis),
-			CartProductService:     services.NewCartProductService(db, redis),
-			OrderService:           services.NewOrderService(db, redis),
-			OrderProductService:    services.NewOrderProductService(db, redis),
-			ConversationService:    services.NewConversationService(db, redis),
-			MessageService:         services.NewMessageService(db, redis),
+			UserService:                  services.NewUserService(db, redis),
+			ProductService:               services.NewProductService(db, redis),
+			CustomProductService:         services.NewCustomProductService(db, redis),
+			CategoryService:              services.NewCategoryService(db, redis),
+			ProductCategoryService:       services.NewProductCategoryService(db, redis),
+			CartService:                  services.NewCartService(db, redis),
+			CartProductService:           services.NewCartProductService(db, redis),
+			OrderService:                 services.NewOrderService(db, redis),
+			OrderProductService:          services.NewOrderProductService(db, redis),
+			ConversationService:          services.NewConversationService(db, redis),
+			MessageService:               services.NewMessageService(db, redis),
+			NotificationService:          services.NewNotificationService(db, redis),
+			NotificationRecipientService: services.NewNotificationRecipientService(db, redis),
 		}}))
 
 		handler.AddTransport(transport.POST{})

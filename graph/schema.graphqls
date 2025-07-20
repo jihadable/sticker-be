@@ -109,8 +109,10 @@ type OrderProduct {
 type Conversation {
 	id: ID!
 	# customer_id: String!
+	# admin_id: String!
 
 	customer: User!
+	admin: User!
 	messages: [Message]!
 }
 

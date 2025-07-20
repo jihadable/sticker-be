@@ -12,6 +12,7 @@ import (
 
 type ConversationService interface {
 	AddConversation(conversation *models.Conversation) (*models.Conversation, error)
+	GetConversationById(id string) (*models.Conversation, error)
 	GetConversationByCustomer(customer_id string) (*models.Conversation, error)
 }
 
@@ -45,7 +46,7 @@ func (service *ConversationServiceImpl) GetConversationById(id string) (*models.
 	}
 
 	conversation := models.Conversation{}
-	err = service.DB.Where("id = ?", id).Preload("Customer").Preload("Messages").First(&conversation).Error
+	err = service.DB.Where("id = ?", id).Preload("Customer").Preload("Admin").Preload("Messages").First(&conversation).Error
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func (service *ConversationServiceImpl) GetConversationById(id string) (*models.
 
 func (service *ConversationServiceImpl) GetConversationByCustomer(customer_id string) (*models.Conversation, error) {
 	conversation := models.Conversation{}
-	err := service.DB.Where("customer_id = ?", customer_id).Preload("Customer").Preload("Messages").First(&conversation).Error
+	err := service.DB.Where("customer_id = ?", customer_id).Preload("Customer").Preload("Admin").Preload("Messages").First(&conversation).Error
 	if err != nil {
 		return nil, err
 	}

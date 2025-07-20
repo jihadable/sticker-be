@@ -14,9 +14,9 @@ type OrderService interface {
 }
 
 type OrderServiceImpl struct {
-	DB                  *gorm.DB
-	Redis               *redis.Client
-	OrderProductService OrderProductService
+	DB    *gorm.DB
+	Redis *redis.Client
+	OrderProductService
 }
 
 func (service *OrderServiceImpl) AddOrder(order *models.Order, orderProducts []*models.OrderProduct) (*models.Order, error) {
