@@ -24,7 +24,7 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
+		"query": "mutation($image: Upload!){ create_custom_product(name: \"custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
 		"variables": {
 			"image": null
 		}
@@ -53,15 +53,15 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postCustomProduct, ok := data["post_custom_product"].(map[string]any)
+	customProduct, ok := data["create_custom_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postCustomProduct["id"])
-	CustomProductId = postCustomProduct["id"].(string)
-	assert.Equal(t, "custom product test", postCustomProduct["name"])
-	assert.NotEmpty(t, postCustomProduct["image_url"])
+	assert.NotEmpty(t, customProduct["id"])
+	CustomProductId = customProduct["id"].(string)
+	assert.Equal(t, "custom product test", customProduct["name"])
+	assert.NotEmpty(t, customProduct["image_url"])
 
-	customer, ok := postCustomProduct["customer"].(map[string]any)
+	customer, ok := customProduct["customer"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, customer["id"])
@@ -77,7 +77,7 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_custom_product(){
+			create_custom_product(){
 				id, name, image_url,
 				customer { id, name, email, role, phone, address }
 			}
@@ -106,7 +106,7 @@ func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 func TestGetCustomProductsByUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			custom_products_by_user {
+			get_custom_products_by_user {
 				id, name, image_url, 
 				customer { id, name, email, role, phone, address }
 			}
@@ -126,7 +126,7 @@ func TestGetCustomProductsByUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	customProducts, ok := data["custom_products_by_user"].([]map[string]any)
+	customProducts, ok := data["get_custom_products_by_user"].([]map[string]any)
 	assert.True(t, ok)
 
 	customProduct := customProducts[0]
@@ -150,7 +150,7 @@ func TestGetCustomProductsByUser(t *testing.T) {
 func TestGetCustomProductWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			custom_product(id: "` + CustomProductId + `"){
+			get_custom_product(id: "` + CustomProductId + `"){
 				id, name, image_url,
 				customer { id, name, email, role, phone, address }
 			}
@@ -170,7 +170,7 @@ func TestGetCustomProductWithValidId(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	customProduct, ok := data["custom_product"].(map[string]any)
+	customProduct, ok := data["get_custom_product"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.Equal(t, CustomProductId, customProduct["id"])
@@ -193,7 +193,7 @@ func TestGetCustomProductWithValidId(t *testing.T) {
 func TestGetCustomProductWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			custom_product(id: "xxx"){
+			get_custom_product(id: "xxx"){
 				id, name, image_url,
 				customer { id, name, email, role, phone, address }
 			}
@@ -261,14 +261,14 @@ func TestUpdateCustomProduct(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	updateCustomProduct, ok := data["update_custom_product"].(map[string]any)
+	customProduct, ok := data["update_custom_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, ProductId, updateCustomProduct["id"])
-	assert.Equal(t, "update custom product test", updateCustomProduct["name"])
-	assert.NotEmpty(t, updateCustomProduct["image_url"])
+	assert.Equal(t, ProductId, customProduct["id"])
+	assert.Equal(t, "update custom product test", customProduct["name"])
+	assert.NotEmpty(t, customProduct["image_url"])
 
-	customer, ok := updateCustomProduct["customer"].(map[string]any)
+	customer, ok := customProduct["customer"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, customer["id"])
@@ -319,7 +319,7 @@ func TestCreateCustomProductWithValidPayload2(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_custom_product(name: \"custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
+		"query": "mutation($image: Upload!){ create_custom_product(name: \"custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
 		"variables": {
 			"image": null
 		}
@@ -348,15 +348,15 @@ func TestCreateCustomProductWithValidPayload2(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postCustomProduct, ok := data["post_custom_product"].(map[string]any)
+	customProduct, ok := data["create_custom_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postCustomProduct["id"])
-	CustomProductId = postCustomProduct["id"].(string)
-	assert.Equal(t, "custom product test", postCustomProduct["name"])
-	assert.NotEmpty(t, postCustomProduct["image_url"])
+	assert.NotEmpty(t, customProduct["id"])
+	CustomProductId = customProduct["id"].(string)
+	assert.Equal(t, "custom product test", customProduct["name"])
+	assert.NotEmpty(t, customProduct["image_url"])
 
-	customer, ok := postCustomProduct["customer"].(map[string]any)
+	customer, ok := customProduct["customer"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, customer["id"])

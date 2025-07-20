@@ -11,7 +11,7 @@ import (
 func TestCreateMessageWithoutReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_message(conversation_id: "` + ConversationId + `", message: "test message"){
+			create_message(conversation_id: "` + ConversationId + `", message: "test message"){
 				id, message,
 				sender { id, name, email, role, phone, address }
 			}
@@ -31,13 +31,13 @@ func TestCreateMessageWithoutReply(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postMessage, ok := data["post_message"].(map[string]any)
+	message, ok := data["create_message"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postMessage["id"])
-	assert.Equal(t, "test message", postMessage["message"])
+	assert.NotEmpty(t, message["id"])
+	assert.Equal(t, "test message", message["message"])
 
-	sender, ok := postMessage["sender"].(map[string]any)
+	sender, ok := message["sender"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, sender["id"])
@@ -53,7 +53,7 @@ func TestCreateMessageWithoutReply(t *testing.T) {
 func TestCreateMessageWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_message(){
+			create_message(){
 				id, message,
 				sender { id, name, email, role, phone, address }
 			}
@@ -82,7 +82,7 @@ func TestCreateMessageWithInvalidPayload(t *testing.T) {
 func TestCreateMessageWithProductReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_message(conversation_id: "` + ConversationId + `", product_id: "` + ProductId + `", message: "test message"){
+			create_message(conversation_id: "` + ConversationId + `", product_id: "` + ProductId + `", message: "test message"){
 				id, product, message,
 				sender { id, name, email, role, phone, address }
 			}
@@ -102,13 +102,13 @@ func TestCreateMessageWithProductReply(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postMessage, ok := data["post_message"].(map[string]any)
+	message, ok := data["create_message"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postMessage["id"])
-	assert.Equal(t, "test message", postMessage["message"])
+	assert.NotEmpty(t, message["id"])
+	assert.Equal(t, "test message", message["message"])
 
-	product, ok := postMessage["product"].(map[string]any)
+	product, ok := message["product"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, product["id"])
@@ -118,7 +118,7 @@ func TestCreateMessageWithProductReply(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	sender, ok := postMessage["sender"].(map[string]any)
+	sender, ok := message["sender"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, sender["id"])
@@ -134,7 +134,7 @@ func TestCreateMessageWithProductReply(t *testing.T) {
 func TestCreateMessageWithCustomProductReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_message(conversation_id: "` + ConversationId + `", custom_product_id: "` + CustomProductId + `", message: "test message"){
+			create_message(conversation_id: "` + ConversationId + `", custom_product_id: "` + CustomProductId + `", message: "test message"){
 				id, custom_product, message, 
 				sender { id, name, email, role, phone, address }
 			}
@@ -154,20 +154,20 @@ func TestCreateMessageWithCustomProductReply(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postMessage, ok := data["post_message"].(map[string]any)
+	message, ok := data["create_message"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postMessage["id"])
-	assert.Equal(t, "test message", postMessage["message"])
+	assert.NotEmpty(t, message["id"])
+	assert.Equal(t, "test message", message["message"])
 
-	customProduct, ok := postMessage["custom_product"].(map[string]any)
+	customProduct, ok := message["custom_product"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, customProduct["id"])
 	assert.NotEmpty(t, customProduct["name"])
 	assert.NotEmpty(t, customProduct["image_url"])
 
-	sender, ok := postMessage["sender"].(map[string]any)
+	sender, ok := message["sender"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, sender["id"])

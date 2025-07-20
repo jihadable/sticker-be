@@ -11,7 +11,7 @@ import (
 func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_product_category(product_id: "` + ProductId + `", category_id: "` + CategoryId + `"){
+			create_product_category(product_id: "` + ProductId + `", category_id: "` + CategoryId + `"){
 				product { id, name, price, stock, image_url, description },
 				category { id }
 			}
@@ -31,10 +31,10 @@ func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postProductCategory, ok := data["post_product_category"].(map[string]any)
+	productCategory, ok := data["create_product_category"].(map[string]any)
 	assert.True(t, ok)
 
-	product, ok := postProductCategory["product"].(map[string]any)
+	product, ok := productCategory["product"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, product["id"])
@@ -44,7 +44,7 @@ func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	category, ok := postProductCategory["product"].(map[string]any)
+	category, ok := productCategory["category"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, category["id"])
@@ -55,7 +55,7 @@ func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 func TestCreateProductCategoryWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_product_category(){
+			create_product_category(){
 				product { id, name, price, stock, image_url, description },
 				category { id }
 			}

@@ -11,7 +11,7 @@ import (
 func TestPostOrderWithValidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_order(
+			create_order(
 				order_items: [
 					{
 						product_id: "` + ProductId + `"
@@ -48,7 +48,7 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	order, ok := data["post_order"].(map[string]any)
+	order, ok := data["create_order"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, order["id"])
@@ -81,7 +81,7 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 func TestPostOrderWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_order(){
+			create_order(){
 				id, status, total_price, 
 				customer { id, name, email, role, phone, address }, 
 				products { id, name, price, stock, image_url, description }
@@ -111,7 +111,7 @@ func TestPostOrderWithInvalidPayload(t *testing.T) {
 func TestGetOrdersByUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			orders_by_user {
+			get_orders_by_user {
 				id, status, total_price, 
 				customer { id, name, email, role, phone, address }, 
 				products { id, name, price, stock, image_url, description }
@@ -132,7 +132,7 @@ func TestGetOrdersByUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	orders, ok := data["orders_by_user"].([]map[string]any)
+	orders, ok := data["get_orders_by_user"].([]map[string]any)
 	assert.True(t, ok)
 
 	order := orders[0]
@@ -168,7 +168,7 @@ func TestGetOrdersByUser(t *testing.T) {
 func TestGetOrderWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			order(id: "` + OrderId + `"){
+			get_order(id: "` + OrderId + `"){
 				id, status, total_price, 
 				customer { id, name, email, role, phone, address }, 
 				products { id, name, price, stock, image_url, description }
@@ -189,7 +189,7 @@ func TestGetOrderWithValidId(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	order, ok := data["order"].(map[string]any)
+	order, ok := data["get_order"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, order["id"])
@@ -223,7 +223,7 @@ func TestGetOrderWithValidId(t *testing.T) {
 func TestGetOrderWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			order(id: "xxx"){
+			get_order(id: "xxx"){
 				id, status, total_price, 
 				customer { id, name, email, role, phone, address }, 
 				products { id, name, price, stock, image_url, description }

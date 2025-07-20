@@ -11,7 +11,7 @@ import (
 func TestGetConversationByUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			conversation_by_user { id }		
+			get_conversation_by_user { id }		
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -28,7 +28,7 @@ func TestGetConversationByUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	conversation, ok := data["conversation_by_user"].(map[string]any)
+	conversation, ok := data["get_conversation_by_user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, conversation["id"])

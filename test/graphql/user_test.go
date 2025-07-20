@@ -36,15 +36,15 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postUser, ok := data["post_user"].(map[string]any)
+	register, ok := data["register"].(map[string]any)
 	assert.True(t, ok)
 
-	token, ok := postUser["token"].(string)
+	token, ok := register["token"].(string)
 	assert.True(t, ok)
 	assert.NotEmpty(t, token)
 	CustomerJWT = token
 
-	user, ok := postUser["user"].(map[string]any)
+	user, ok := register["user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])
@@ -105,7 +105,7 @@ func TestGetUserWithToken(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	user, ok := data["user"].(map[string]any)
+	user, ok := data["get_user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])
@@ -165,15 +165,15 @@ func TestUpadateUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postUser, ok := data["post_user"].(map[string]any)
+	updateUser, ok := data["update_user"].(map[string]any)
 	assert.True(t, ok)
 
-	token, ok := postUser["token"].(string)
+	token, ok := updateUser["token"].(string)
 	assert.True(t, ok)
 	assert.NotEmpty(t, token)
 	CustomerJWT = token
 
-	user, ok := postUser["user"].(map[string]any)
+	user, ok := updateUser["user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])
@@ -211,15 +211,15 @@ func TestLoginAsCustomer(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postUser, ok := data["post_user"].(map[string]any)
+	login, ok := data["login"].(map[string]any)
 	assert.True(t, ok)
 
-	token, ok := postUser["token"].(string)
+	token, ok := login["token"].(string)
 	assert.True(t, ok)
 	assert.NotEmpty(t, token)
 	CustomerJWT = token
 
-	user, ok := postUser["user"].(map[string]any)
+	user, ok := login["user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])
@@ -257,15 +257,15 @@ func TestLoginAsAdmin(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postUser, ok := data["post_user"].(map[string]any)
+	login, ok := data["login"].(map[string]any)
 	assert.True(t, ok)
 
-	token, ok := postUser["token"].(string)
+	token, ok := login["token"].(string)
 	assert.True(t, ok)
 	assert.NotEmpty(t, token)
 	AdminJWT = token
 
-	user, ok := postUser["user"].(map[string]any)
+	user, ok := login["user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])

@@ -11,7 +11,7 @@ import (
 func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_category(id: "test category"){
+			create_category(id: "test category"){
 				id, products { id, name, price, stock, image_url, description }
 			}
 		}`,
@@ -30,12 +30,12 @@ func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postCategory, ok := data["post_category"].(map[string]any)
+	category, ok := data["create_category"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, "test category", postCategory["id"])
-	CategoryId = postCategory["id"].(string)
-	assert.Empty(t, postCategory["products"])
+	assert.Equal(t, "test category", category["id"])
+	CategoryId = category["id"].(string)
+	assert.Empty(t, category["products"])
 
 	t.Log("✅")
 }
@@ -43,7 +43,7 @@ func TestCreateCategoryWithValidPayload1(t *testing.T) {
 func TestCreateCategoryWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_category(){
+			create_category(){
 				id, products { id, name, price, stock, image_url, description }
 			}
 		}`,
@@ -71,7 +71,7 @@ func TestCreateCategoryWithInvalidPayload(t *testing.T) {
 func TestGetCategories(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"qeury": `mutation {
-			categories {
+			get_categories {
 				id, products { id, name, price, stock, image_url, description }
 			}
 		}`,
@@ -89,7 +89,7 @@ func TestGetCategories(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	categories, ok := data["categories"].([]map[string]any)
+	categories, ok := data["get_categories"].([]map[string]any)
 	assert.True(t, ok)
 
 	category := categories[0]
@@ -102,7 +102,7 @@ func TestGetCategories(t *testing.T) {
 func TestGetCategoryWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			category(id: "` + CategoryId + `"){
+			get_category(id: "` + CategoryId + `"){
 				id, products { id, name, price, stock, image_url, description }
 			}
 		}`,
@@ -120,7 +120,7 @@ func TestGetCategoryWithValidId(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	category, ok := data["category"].(map[string]any)
+	category, ok := data["get_category"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.Equal(t, CategoryId, category["id"])
@@ -132,7 +132,7 @@ func TestGetCategoryWithValidId(t *testing.T) {
 func TestGetCategoryWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			category(id: "xxx"){
+			get_category(id: "xxx"){
 				id, products { id, name, price, stock, image_url, description }
 			}
 		}`,
@@ -186,7 +186,7 @@ func TestDeleteCategory(t *testing.T) {
 func TestCreateCategoryWithValidPayload2(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_category(id: "test category"){
+			create_category(id: "test category"){
 				id, products { id, name, price, stock, image_url, description }
 			}
 		}`,
@@ -205,7 +205,7 @@ func TestCreateCategoryWithValidPayload2(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postCategory, ok := data["post_category"].(map[string]any)
+	postCategory, ok := data["create_category"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.Equal(t, "test category", postCategory["id"])

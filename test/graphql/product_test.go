@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPostProductWithValidPayload1(t *testing.T) {
+func TestCreateProductWithValidPayload1(t *testing.T) {
 	filePath := filepath.Join("..", "..", "static", "redis.png")
 	file, err := os.Open(filePath)
 	assert.Nil(t, err)
@@ -24,7 +24,7 @@ func TestPostProductWithValidPayload1(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
+		"query": "mutation($image: Upload!){ create_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
 		"variables": {
 			"image": null
 		}
@@ -53,25 +53,25 @@ func TestPostProductWithValidPayload1(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postProduct, ok := data["post_product"].(map[string]any)
+	product, ok := data["create_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postProduct["id"])
-	ProductId = postProduct["id"].(string)
-	assert.Equal(t, "product test", postProduct["name"])
-	assert.Equal(t, 1000, postProduct["price"])
-	assert.Equal(t, 100, postProduct["stock"])
-	assert.NotEmpty(t, postProduct["image_url"])
-	assert.Equal(t, "desc test", postProduct["description"])
-	assert.Empty(t, postProduct["categories"])
+	assert.NotEmpty(t, product["id"])
+	ProductId = product["id"].(string)
+	assert.Equal(t, "product test", product["name"])
+	assert.Equal(t, 1000, product["price"])
+	assert.Equal(t, 100, product["stock"])
+	assert.NotEmpty(t, product["image_url"])
+	assert.Equal(t, "desc test", product["description"])
+	assert.Empty(t, product["categories"])
 
 	t.Log("✅")
 }
 
-func TestPostProductWithInvalidPayload(t *testing.T) {
+func TestCreateProductWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_product(){
+			create_product(){
 				id, name, price, stock, image_url, description,
 				categories { id }
 			}	
@@ -100,7 +100,7 @@ func TestPostProductWithInvalidPayload(t *testing.T) {
 func TestGetProducts(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			products {
+			get_products {
 				id, name, price, stock, image_url, description, 
 				categories { id }
 			}	
@@ -119,7 +119,7 @@ func TestGetProducts(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	products, ok := data["products"].([]map[string]any)
+	products, ok := data["get_products"].([]map[string]any)
 	assert.True(t, ok)
 
 	product := products[0]
@@ -137,7 +137,7 @@ func TestGetProducts(t *testing.T) {
 func TestGetProductWithValidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			product(id: "` + ProductId + `"){
+			get_product(id: "` + ProductId + `"){
 				id, name, price, stock, image_url, description,
 				categories { id }
 			}
@@ -156,7 +156,7 @@ func TestGetProductWithValidId(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	product, ok := data["product"].(map[string]any)
+	product, ok := data["get_product"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, product["id"])
@@ -173,7 +173,7 @@ func TestGetProductWithValidId(t *testing.T) {
 func TestGetProductWithInvalidId(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			product(id: "xxx"){
+			get_product(id: "xxx"){
 				id, name, price, stock, image_url, description,
 				categories { id }
 			}
@@ -240,16 +240,16 @@ func TestUpdateProduct(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	updateProduct, ok := data["update_product"].(map[string]any)
+	product, ok := data["update_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, ProductId, updateProduct["id"])
-	assert.Equal(t, "update product test", updateProduct["name"])
-	assert.Equal(t, 1500, updateProduct["price"])
-	assert.Equal(t, 10, updateProduct["stock"])
-	assert.NotEmpty(t, updateProduct["image_url"])
-	assert.Equal(t, "update desc test", updateProduct["description"])
-	assert.Empty(t, updateProduct["categories"])
+	assert.Equal(t, ProductId, product["id"])
+	assert.Equal(t, "update product test", product["name"])
+	assert.Equal(t, 1500, product["price"])
+	assert.Equal(t, 10, product["stock"])
+	assert.NotEmpty(t, product["image_url"])
+	assert.Equal(t, "update desc test", product["description"])
+	assert.Empty(t, product["categories"])
 
 	t.Log("✅")
 }
@@ -279,7 +279,7 @@ func TestDeleteProduct(t *testing.T) {
 	t.Log("✅")
 }
 
-func TestPostProductWithValidPayload2(t *testing.T) {
+func TestCreateProductWithValidPayload2(t *testing.T) {
 	filePath := filepath.Join("..", "..", "static", "redis.png")
 	file, err := os.Open(filePath)
 	assert.Nil(t, err)
@@ -290,7 +290,7 @@ func TestPostProductWithValidPayload2(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ post_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
+		"query": "mutation($image: Upload!){ create_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
 		"variables": {
 			"image": null
 		}
@@ -319,17 +319,17 @@ func TestPostProductWithValidPayload2(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	postProduct, ok := data["post_product"].(map[string]any)
+	product, ok := data["create_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.NotEmpty(t, postProduct["id"])
-	ProductId = postProduct["id"].(string)
-	assert.Equal(t, "product test", postProduct["name"])
-	assert.Equal(t, 1000, postProduct["price"])
-	assert.Equal(t, 100, postProduct["stock"])
-	assert.NotEmpty(t, postProduct["image_url"])
-	assert.Equal(t, "desc test", postProduct["description"])
-	assert.Empty(t, postProduct["categories"])
+	assert.NotEmpty(t, product["id"])
+	ProductId = product["id"].(string)
+	assert.Equal(t, "product test", product["name"])
+	assert.Equal(t, 1000, product["price"])
+	assert.Equal(t, 100, product["stock"])
+	assert.NotEmpty(t, product["image_url"])
+	assert.Equal(t, "desc test", product["description"])
+	assert.Empty(t, product["categories"])
 
 	t.Log("✅")
 }

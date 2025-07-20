@@ -65,3 +65,4 @@ var ProductId, CustomProductId string
 var CategoryId string
 var ConversationId string
 var OrderId string
+var CartId string
