@@ -16,8 +16,8 @@ import (
 	"github.com/jihadable/sticker-be/validators"
 )
 
-// PostUser is the resolver for the post_user field.
-func (r *mutationResolver) PostUser(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
+// Register is the resolver for the register field.
+func (r *mutationResolver) Register(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
 	user, err := r.UserService.AddUser(&models.User{
 		Name:     name,
 		Email:    email,
@@ -90,8 +90,8 @@ func (r *mutationResolver) PostUser(ctx context.Context, name string, email stri
 	return &model.Auth{User: mapper.DBUserToGraphQLUser(user), Token: *token}, nil
 }
 
-// VerifyUser is the resolver for the verify_user field.
-func (r *mutationResolver) VerifyUser(ctx context.Context, email string, password string) (*model.Auth, error) {
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Auth, error) {
 	user, err := r.UserService.VerifyUser(email, password)
 	if err != nil {
 		return nil, err
@@ -124,8 +124,8 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, phone string, address
 	return mapper.DBUserToGraphQLUser(user), nil
 }
 
-// PostProduct is the resolver for the post_product field.
-func (r *mutationResolver) PostProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error) {
+// CreateProduct is the resolver for the create_product field.
+func (r *mutationResolver) CreateProduct(ctx context.Context, name string, price int32, stock int32, description string, image graphql.Upload) (*model.Product, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
 	if err != nil {
@@ -182,8 +182,8 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, 
 	return true, nil
 }
 
-// PostCustomProduct is the resolver for the post_custom_product field.
-func (r *mutationResolver) PostCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error) {
+// CreateCustomProduct is the resolver for the create_custom_product field.
+func (r *mutationResolver) CreateCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -234,8 +234,8 @@ func (r *mutationResolver) DeleteCustomProduct(ctx context.Context, id string) (
 	return true, nil
 }
 
-// PostCategory is the resolver for the post_category field.
-func (r *mutationResolver) PostCategory(ctx context.Context, id string) (*model.Category, error) {
+// CreateCategory is the resolver for the create_category field.
+func (r *mutationResolver) CreateCategory(ctx context.Context, id string) (*model.Category, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
 	if err != nil {
@@ -266,8 +266,8 @@ func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool,
 	return true, nil
 }
 
-// PostProductCategory is the resolver for the post_product_category field.
-func (r *mutationResolver) PostProductCategory(ctx context.Context, productID string, categoryID string) (*model.ProductCategory, error) {
+// CreateProductCategory is the resolver for the create_product_category field.
+func (r *mutationResolver) CreateProductCategory(ctx context.Context, productID string, categoryID string) (*model.ProductCategory, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
 	if err != nil {
@@ -301,8 +301,8 @@ func (r *mutationResolver) DeleteProductCategory(ctx context.Context, productID 
 	return true, nil
 }
 
-// PostCartProduct is the resolver for the post_cart_product field.
-func (r *mutationResolver) PostCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error) {
+// CreateCartProduct is the resolver for the create_cart_product field.
+func (r *mutationResolver) CreateCartProduct(ctx context.Context, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) (*model.CartProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -342,8 +342,8 @@ func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, qua
 	return mapper.DBCartProductToGraphQLCartProduct(cartProduct), nil
 }
 
-// PostOrder is the resolver for the post_order field.
-func (r *mutationResolver) PostOrder(ctx context.Context, orderItems []*model.OrderItem, totalPrice int32) (*model.Order, error) {
+// CreateOrder is the resolver for the create_order field.
+func (r *mutationResolver) CreateOrder(ctx context.Context, orderItems []*model.OrderItem, totalPrice int32) (*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -388,8 +388,8 @@ func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, status st
 	return mapper.DBOrderToGraphQLOrder(order), nil
 }
 
-// PostMessage is the resolver for the post_message field.
-func (r *mutationResolver) PostMessage(ctx context.Context, conversationID string, productID *string, customProductID *string, message string) (*model.Message, error) {
+// CreateMessage is the resolver for the create_message field.
+func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID string, productID *string, customProductID *string, message string) (*model.Message, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.AuthValidator(authHeader, r.UserService)
 	if err != nil {
@@ -448,8 +448,8 @@ func (r *mutationResolver) PostMessage(ctx context.Context, conversationID strin
 	return mapper.DBMessageToGraphQLMessage(newMessage), nil
 }
 
-// User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
+// GetUser is the resolver for the get_user field.
+func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.AuthValidator(authHeader, r.UserService)
 	if err != nil {
@@ -464,8 +464,8 @@ func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
 	return mapper.DBUserToGraphQLUser(user), nil
 }
 
-// Product is the resolver for the product field.
-func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product, error) {
+// GetProduct is the resolver for the get_product field.
+func (r *queryResolver) GetProduct(ctx context.Context, id string) (*model.Product, error) {
 	product, err := r.ProductService.GetProductById(id)
 	if err != nil {
 		return nil, err
@@ -474,8 +474,8 @@ func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product,
 	return mapper.DBProductToGraphQLProduct(product), nil
 }
 
-// Products is the resolver for the products field.
-func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) {
+// GetProducts is the resolver for the get_products field.
+func (r *queryResolver) GetProducts(ctx context.Context) ([]*model.Product, error) {
 	products, err := r.ProductService.GetProducts()
 	if err != nil {
 		return nil, err
@@ -489,8 +489,8 @@ func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) 
 	return productsResponse, nil
 }
 
-// CustomProduct is the resolver for the custom_product field.
-func (r *queryResolver) CustomProduct(ctx context.Context, id string) (*model.CustomProduct, error) {
+// GetCustomProduct is the resolver for the get_custom_product field.
+func (r *queryResolver) GetCustomProduct(ctx context.Context, id string) (*model.CustomProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -505,8 +505,8 @@ func (r *queryResolver) CustomProduct(ctx context.Context, id string) (*model.Cu
 	return mapper.DBCustomProductToGraphQLCustomProduct(customProduct), nil
 }
 
-// CustomProductsByUser is the resolver for the custom_products_by_user field.
-func (r *queryResolver) CustomProductsByUser(ctx context.Context) ([]*model.CustomProduct, error) {
+// GetCustomProductsByCustomer is the resolver for the get_custom_products_by_user field.
+func (r *queryResolver) GetCustomProductsByCustomer(ctx context.Context) ([]*model.CustomProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -526,8 +526,8 @@ func (r *queryResolver) CustomProductsByUser(ctx context.Context) ([]*model.Cust
 	return customProductsResponse, nil
 }
 
-// Category is the resolver for the category field.
-func (r *queryResolver) Category(ctx context.Context, id string) (*model.Category, error) {
+// GetCategory is the resolver for the get_category field.
+func (r *queryResolver) GetCategory(ctx context.Context, id string) (*model.Category, error) {
 	category, err := r.CategoryService.GetCategoryById(id)
 	if err != nil {
 		return nil, err
@@ -536,8 +536,8 @@ func (r *queryResolver) Category(ctx context.Context, id string) (*model.Categor
 	return mapper.DBCategoryToGraphQLCategory(category), nil
 }
 
-// Categories is the resolver for the categories field.
-func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
+// GetCategories is the resolver for the get_categories field.
+func (r *queryResolver) GetCategories(ctx context.Context) ([]*model.Category, error) {
 	categories, err := r.CategoryService.GetCategories()
 	if err != nil {
 		return nil, err
@@ -551,8 +551,8 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, erro
 	return categoriesResponse, nil
 }
 
-// CartByUser is the resolver for the cart_by_user field.
-func (r *queryResolver) CartByUser(ctx context.Context) (*model.Cart, error) {
+// GetCartByCustomer is the resolver for the get_cart_by_user field.
+func (r *queryResolver) GetCartByCustomer(ctx context.Context) (*model.Cart, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -567,8 +567,8 @@ func (r *queryResolver) CartByUser(ctx context.Context) (*model.Cart, error) {
 	return mapper.DBCartToGraphQLCart(cart), nil
 }
 
-// Order is the resolver for the order field.
-func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, error) {
+// GetOrder is the resolver for the get_order field.
+func (r *queryResolver) GetOrder(ctx context.Context, id string) (*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.AuthValidator(authHeader, r.UserService)
 	if err != nil {
@@ -583,8 +583,8 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, err
 	return mapper.DBOrderToGraphQLOrder(order), nil
 }
 
-// OrdersByUser is the resolver for the orders_by_user field.
-func (r *queryResolver) OrdersByUser(ctx context.Context) ([]*model.Order, error) {
+// GetOrdersByCustomer is the resolver for the get_orders_by_user field.
+func (r *queryResolver) GetOrdersByCustomer(ctx context.Context) ([]*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
@@ -604,8 +604,8 @@ func (r *queryResolver) OrdersByUser(ctx context.Context) ([]*model.Order, error
 	return ordersResponse, nil
 }
 
-// ConversationByUser is the resolver for the conversation_by_user field.
-func (r *queryResolver) ConversationByUser(ctx context.Context) (*model.Conversation, error) {
+// GetConversationByUser is the resolver for the get_conversation_by_user field.
+func (r *queryResolver) GetConversationByUser(ctx context.Context) (*model.Conversation, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {

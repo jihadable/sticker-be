@@ -145,45 +145,45 @@ input OrderItem {
 
 type Query {
 	# user
-	user: User!
+	get_user: User!
 
 	# product
-	product(id: ID!): Product!
-	products: [Product]!
+	get_product(id: ID!): Product!
+	get_products: [Product]!
 
 	# custom_product
-	custom_product(id: ID!): CustomProduct!
-	custom_products_by_user: [CustomProduct]!
+	get_custom_product(id: ID!): CustomProduct!
+	get_custom_products_by_customer: [CustomProduct]!
 
 	# category
-	category(id: ID!): Category!
-	categories: [Category]!
+	get_category(id: ID!): Category!
+	get_categories: [Category]!
 
 	# cart
-	cart_by_user: Cart!
+	get_cart_by_customer: Cart!
 
 	# order
-	order(id: ID!): Order!
-	orders_by_user: [Order]!
+	get_order(id: ID!): Order!
+	get_orders_by_customer: [Order]!
 
 	# conversation
-	conversation_by_user: Conversation
+	get_conversation_by_user: Conversation
 }
 
 type Mutation {
 	# user
-	post_user(
+	register(
 		name: String!
 		email: String!
 		password: String!
 		phone: String!
 		address: String!
 	): Auth!
-	verify_user(email: String!, password: String!): Auth!
+	login(email: String!, password: String!): Auth!
 	update_user(phone: String!, address: String!): User!
 
 	# product
-	post_product(
+	create_product(
 		name: String!
 		price: Int!
 		stock: Int!
@@ -201,7 +201,7 @@ type Mutation {
 	delete_product(id: ID!): Boolean!
 
 	# custom_product
-	post_custom_product(name: String!, image: Upload!): CustomProduct!
+	create_custom_product(name: String!, image: Upload!): CustomProduct!
 	update_custom_product(
 		id: ID!
 		name: String!
@@ -210,15 +210,15 @@ type Mutation {
 	delete_custom_product(id: ID!): Boolean!
 
 	# category
-	post_category(id: ID!): Category!
+	create_category(id: ID!): Category!
 	delete_category(id: ID!): Boolean!
 
 	# product_category
-	post_product_category(product_id: ID!, category_id: ID!): ProductCategory!
+	create_product_category(product_id: ID!, category_id: ID!): ProductCategory!
 	delete_product_category(product_id: ID!, category_id: ID!): Boolean! 
 
 	# cart_product
-	post_cart_product(
+	create_cart_product(
 		cart_id: ID!
 		product_id: ID
 		custom_product_id: ID
@@ -232,11 +232,11 @@ type Mutation {
 	): CartProduct!
 
 	# order
-	post_order(order_items: [OrderItem]!, total_price: Int!): Order!
+	create_order(order_items: [OrderItem]!, total_price: Int!): Order!
 	update_order(id: ID!, status: String!): Order!
 
 	# message
-	post_message(
+	create_message(
 		conversation_id: ID!
 		product_id: ID
 		custom_product_id: ID

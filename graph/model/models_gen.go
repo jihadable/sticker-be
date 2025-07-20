@@ -37,6 +37,7 @@ type Category struct {
 type Conversation struct {
 	ID       string     `json:"id"`
 	Customer *User      `json:"customer"`
+	Admin    *User      `json:"admin"`
 	Messages []*Message `json:"messages"`
 }
 

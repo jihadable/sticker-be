@@ -11,7 +11,7 @@ import (
 func TestRegisterUserWithValidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_user(
+			register(
 				name: "user test"
 				email: "usertest@gmail.com"
 				password: "test"
@@ -60,7 +60,7 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 func TestPostUserWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			post_user(){
+			register(){
 				token
 				user { id, name, email, role, phone, address }
 			}
@@ -88,7 +88,7 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 func TestGetUserWithToken(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			user { id, name, email, role, phone, address }
+			get_user { id, name, email, role, phone, address }
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -121,7 +121,7 @@ func TestGetUserWithToken(t *testing.T) {
 func TestGetUserWithoutToken(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			user { id, name, email, role, phone, address }
+			get_user { id, name, email, role, phone, address }
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
@@ -189,7 +189,7 @@ func TestUpadateUser(t *testing.T) {
 func TestLoginAsCustomer(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			verify_user(
+			login(
 				email: "usertest@gmail.com"
 				password: "test"
 			){
@@ -235,7 +235,7 @@ func TestLoginAsCustomer(t *testing.T) {
 func TestLoginAsAdmin(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			verify_user(
+			login(
 				email: "stickeradmin@gmail.com"
 				password: "test"
 			){
@@ -279,7 +279,7 @@ func TestLoginAsAdmin(t *testing.T) {
 func TestLoginWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			verify_user(){
+			login(){
 				token
 				user { id, name, email, role, phone, address }
 			}

@@ -62,3 +62,77 @@ func main() {
 
 	app.Listen(":3000")
 }
+
+// PostUser is the resolver for the post_user field.
+// func (r *mutationResolver) PostUser(ctx context.Context, name string, email string, password string, phone string, address string) (*model.Auth, error) {
+// 	user, err := r.UserService.AddUser(&models.User{
+// 		Name:     name,
+// 		Email:    email,
+// 		Password: password,
+// 		Phone:    &phone,
+// 		Address:  &address,
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	_, err = r.CartService.AddCart(&models.Cart{CustomerId: user.Id})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	admin, err := r.UserService.GetAdmin()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	conversation, err := r.ConversationService.AddConversation(&models.Conversation{
+// 		CustomerId: user.Id,
+// 		AdminId:    admin.Id,
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	newMessage, err := r.MessageService.AddMessage(&models.Message{
+// 		ConversationId: conversation.Id,
+// 		SenderId:       admin.Id,
+// 		Message:        "Selamat datang di stikerin",
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	notification, err := r.NotificationService.AddNotification(&models.Notification{
+// 		Title:   "Selamat datang di stikerin",
+// 		Message: newMessage.Message,
+// 		Type:    "new_message",
+// 	}, user.Id)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	err = config.MessageTrigger("new_message", newMessage)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	pushNotification := models.PushNotification{
+// 		UserId:  user.Id,
+// 		Type:    notification.Type,
+// 		Title:   notification.Title,
+// 		Message: notification.Message,
+// 		IsRead:  false,
+// 	}
+// 	err = config.NotificationTrigger("new_message_notification_"+user.Id, pushNotification)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	token, err := utils.GenerateJWT(user.Id, user.Role)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &model.Auth{User: mapper.DBUserToGraphQLUser(user), Token: *token}, nil
+// }
