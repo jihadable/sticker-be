@@ -40,7 +40,7 @@ func main() {
 			OrderService:           services.NewOrderService(db, redis, services.NewOrderProductService(db, redis)),
 			ConversationService:    services.NewConversationService(db, redis),
 			MessageService:         services.NewMessageService(db, redis),
-			NotificationService:    services.NewNotificationService(db, redis, services.NewNotificationRecipientService(db, redis)),
+			NotificationService:    services.NewNotificationService(db, redis),
 		}}))
 
 		handler.AddTransport(transport.POST{})

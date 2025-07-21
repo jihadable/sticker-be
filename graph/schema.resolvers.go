@@ -57,27 +57,21 @@ func (r *mutationResolver) Register(ctx context.Context, name string, email stri
 	}
 
 	notification, err := r.NotificationService.AddNotification(&models.Notification{
-		Title:   "Selamat datang di stikerin",
-		Message: newMessage.Message,
-		Type:    "new_message",
-	}, user.Id)
+		Type:        "new_message",
+		RecipientId: user.Id,
+		Title:       "Selamat datang di stikerin",
+		Message:     newMessage.Message,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	err = config.MessageTrigger("new_message", newMessage)
+	err = config.MessageTrigger("new_message", mapper.DBMessageToGraphQLMessage(newMessage))
 	if err != nil {
 		return nil, err
 	}
 
-	pushNotification := models.PushNotification{
-		UserId:  user.Id,
-		Type:    notification.Type,
-		Title:   notification.Title,
-		Message: notification.Message,
-		IsRead:  false,
-	}
-	err = config.NotificationTrigger("new_message_notification_"+user.Id, pushNotification)
+	err = config.NotificationTrigger("new_notification_"+user.Id, mapper.NotificationMapper(notification))
 	if err != nil {
 		return nil, err
 	}
@@ -436,27 +430,21 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID str
 	}
 
 	notification, err := r.NotificationService.AddNotification(&models.Notification{
-		Title:   "Pesan baru",
-		Message: newMessage.Message,
-		Type:    "new_message",
-	}, notifcationRecipientId)
+		Type:        "new_message",
+		RecipientId: notifcationRecipientId,
+		Title:       "Pesan baru",
+		Message:     newMessage.Message,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	err = config.MessageTrigger("new_message", newMessage)
+	err = config.MessageTrigger("new_message", mapper.DBMessageToGraphQLMessage(newMessage))
 	if err != nil {
 		return nil, err
 	}
 
-	pushNotification := models.PushNotification{
-		UserId:  notifcationRecipientId,
-		Type:    notification.Type,
-		Title:   notification.Title,
-		Message: notification.Message,
-		IsRead:  false,
-	}
-	err = config.NotificationTrigger("new_message_notification_"+notifcationRecipientId, pushNotification)
+	err = config.NotificationTrigger("new_notification_"+notifcationRecipientId, mapper.NotificationMapper(notification))
 	if err != nil {
 		return nil, err
 	}

@@ -45,7 +45,6 @@ func DB() *gorm.DB {
 		&models.Conversation{},
 		&models.Message{},
 		&models.Notification{},
-		&models.NotificationRecipient{},
 	)
 
 	return db

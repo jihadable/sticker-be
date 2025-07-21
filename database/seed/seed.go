@@ -25,7 +25,6 @@ func truncateAllTable(db *gorm.DB) error {
 		"orders",
 		"order_products",
 		"notifications",
-		"notification_recipients",
 	}
 
 	query := fmt.Sprintf("TRUNCATE TABLE %s CASCADE", strings.Join(tables, ", "))

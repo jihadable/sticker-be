@@ -11,23 +11,17 @@ import (
 )
 
 type NotificationService interface {
-	AddNotification(notification *models.Notification, recipientIds ...string) (*models.Notification, error)
+	AddNotification(notification *models.Notification) (*models.Notification, error)
 	GetNotificationById(id string) (*models.Notification, error)
 }
 
 type NotificationServiceImpl struct {
 	DB    *gorm.DB
 	Redis *redis.Client
-	NotificationRecipientService
 }
 
-func (service *NotificationServiceImpl) AddNotification(notification *models.Notification, recipientIds ...string) (*models.Notification, error) {
+func (service *NotificationServiceImpl) AddNotification(notification *models.Notification) (*models.Notification, error) {
 	err := service.DB.Create(notification).Error
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = service.NotificationRecipientService.AddNotificationRecipients(notification.Id, recipientIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +59,6 @@ func (service *NotificationServiceImpl) GetNotificationById(id string) (*models.
 	return &notification, nil
 }
 
-func NewNotificationService(db *gorm.DB, redis *redis.Client, notificationRecipientService NotificationRecipientService) NotificationService {
-	return &NotificationServiceImpl{DB: db, Redis: redis, NotificationRecipientService: notificationRecipientService}
+func NewNotificationService(db *gorm.DB, redis *redis.Client) NotificationService {
+	return &NotificationServiceImpl{DB: db, Redis: redis}
 }
