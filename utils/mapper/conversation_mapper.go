@@ -14,6 +14,7 @@ func DBConversationTOGraphQLConversation(conversation *models.Conversation) *mod
 	return &model.Conversation{
 		ID:       conversation.Id,
 		Customer: DBUserToGraphQLUser(conversation.Customer),
+		Admin:    DBUserToGraphQLUser(conversation.Admin),
 		Messages: messages,
 	}
 }

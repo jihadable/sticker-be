@@ -7,7 +7,7 @@ import (
 )
 
 type NotificationRecipientService interface {
-	AddNotificationRecipients(notificationId string, recipientIds ...string) (*models.NotificationRecipient, error)
+	AddNotificationRecipients(notificationId string, recipientIds ...string) ([]models.NotificationRecipient, error)
 }
 
 type NotificationRecipientServiceImpl struct {
@@ -15,8 +15,23 @@ type NotificationRecipientServiceImpl struct {
 	Redis *redis.Client
 }
 
-func (service *NotificationRecipientServiceImpl) AddNotificationRecipients(notificationId string, recipientIds ...string) (*models.NotificationRecipient, error) {
-	panic("")
+func (service *NotificationRecipientServiceImpl) AddNotificationRecipients(notificationId string, recipientIds ...string) ([]models.NotificationRecipient, error) {
+	notificationRecipients := make([]models.NotificationRecipient, len(recipientIds))
+
+	for i, recipientId := range recipientIds {
+		notificationRecipients[i] = models.NotificationRecipient{
+			NotificationId: notificationId,
+			RecipientId:    recipientId,
+			IsRead:         false,
+		}
+	}
+
+	err := service.DB.Create(&notificationRecipients).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return notificationRecipients, nil
 }
 
 func NewNotificationRecipientService(db *gorm.DB, redis *redis.Client) NotificationRecipientService {

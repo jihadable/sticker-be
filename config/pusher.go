@@ -1,16 +1,14 @@
 package config
 
 import (
-	"os"
-
 	"github.com/pusher/pusher-http-go/v5"
 )
 
 var pusherClient = pusher.Client{
-	AppID:   os.Getenv("PUSHER_APP_ID"),
-	Key:     os.Getenv("PUSHER_KEY"),
-	Secret:  os.Getenv("PUSHER_SECRET"),
-	Cluster: os.Getenv("PUSHER_CLUSTER"),
+	AppID:   "2025350",
+	Key:     "e31a8b7ecfbaf1164828",
+	Secret:  "42b4da299d97486eacb4",
+	Cluster: "ap1",
 	Secure:  true,
 }
 
