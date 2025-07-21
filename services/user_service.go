@@ -1,8 +1,6 @@
 package services
 
 import (
-	"errors"
-
 	"github.com/jihadable/sticker-be/models"
 	"github.com/jihadable/sticker-be/utils"
 	"github.com/redis/go-redis/v9"
@@ -67,7 +65,6 @@ func (service *UserServiceImpl) UpdateUserById(id string, updatedUser *models.Us
 		return nil, err
 	}
 
-	user.Name = updatedUser.Name
 	user.Phone = updatedUser.Phone
 	user.Address = updatedUser.Address
 
@@ -89,7 +86,7 @@ func (service *UserServiceImpl) VerifyUser(email, password string) (*models.User
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, errors.New("")
+		return nil, err
 	}
 
 	return &user, nil

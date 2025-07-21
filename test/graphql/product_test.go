@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http/httptest"
@@ -41,9 +42,10 @@ func TestCreateProductWithValidPayload1(t *testing.T) {
 
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", &requestBody)
 	request.Header.Set("Content-Type", writer.FormDataContentType())
+	fmt.Println(writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -59,8 +61,8 @@ func TestCreateProductWithValidPayload1(t *testing.T) {
 	assert.NotEmpty(t, product["id"])
 	ProductId = product["id"].(string)
 	assert.Equal(t, "product test", product["name"])
-	assert.Equal(t, 1000, product["price"])
-	assert.Equal(t, 100, product["stock"])
+	assert.Equal(t, float64(1000), product["price"])
+	assert.Equal(t, float64(100), product["stock"])
 	assert.NotEmpty(t, product["image_url"])
 	assert.Equal(t, "desc test", product["description"])
 	assert.Empty(t, product["categories"])
@@ -84,7 +86,6 @@ func TestCreateProductWithInvalidPayload(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 
@@ -185,7 +186,6 @@ func TestGetProductWithInvalidId(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 

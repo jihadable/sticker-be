@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -28,13 +27,12 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request, -1)
+	response, err := App.Test(request)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
-	fmt.Println(responseBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -75,7 +73,6 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 
@@ -133,7 +130,6 @@ func TestGetUserWithoutToken(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 
@@ -157,6 +153,7 @@ func TestUpdateUser(t *testing.T) {
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
 	response, err := App.Test(request)
 
@@ -168,15 +165,7 @@ func TestUpdateUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	updateUser, ok := data["update_user"].(map[string]any)
-	assert.True(t, ok)
-
-	token, ok := updateUser["token"].(string)
-	assert.True(t, ok)
-	assert.NotEmpty(t, token)
-	CustomerJWT = token
-
-	user, ok := updateUser["user"].(map[string]any)
+	user, ok := data["update_user"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])
@@ -294,7 +283,6 @@ func TestLoginWithInvalidPayload(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 

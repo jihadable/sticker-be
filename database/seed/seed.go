@@ -7,6 +7,7 @@ import (
 
 	"github.com/jihadable/sticker-be/config"
 	"github.com/jihadable/sticker-be/models"
+	"github.com/jihadable/sticker-be/utils"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
@@ -37,14 +38,19 @@ func truncateAllTable(db *gorm.DB) error {
 }
 
 func userSeeder(db *gorm.DB) error {
+	hashedPassword, err := utils.HashPassword(os.Getenv("PRIVATE_PASSWORD"))
+	if err != nil {
+		return err
+	}
+
 	admin := models.User{
 		Name:     "Stiker Admin",
 		Email:    "stikeradmin@gmail.com",
-		Password: os.Getenv("PRIVATE_PASSWORD"),
+		Password: hashedPassword,
 		Role:     "admin",
 	}
 
-	err := db.Create(&admin).Error
+	err = db.Create(&admin).Error
 	if err != nil {
 		return err
 	}

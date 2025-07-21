@@ -52,7 +52,7 @@ func RoleValidator(authHeader string, userService services.UserService, allowedR
 		return nil, err
 	}
 
-	if credit["user_id"] != allowedRole {
+	if credit["role"] != allowedRole {
 		return nil, errors.New("peran pengguna tidak diizinkan")
 	}
 

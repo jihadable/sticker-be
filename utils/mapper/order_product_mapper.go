@@ -12,7 +12,19 @@ func DBOrderProductToGraphQLOrderProduct(orderProduct *models.OrderProduct) *mod
 		Size:          model.Size(orderProduct.Size),
 		SubtotalPrice: int32(orderProduct.SubtotalPrice),
 		Order:         DBOrderToGraphQLOrder(orderProduct.Order),
-		Product:       DBProductToGraphQLProduct(orderProduct.Product),
-		CustomProduct: DBCustomProductToGraphQLCustomProduct(orderProduct.CustomProduct),
+		Product: func() *model.Product {
+			if orderProduct.Product != nil {
+				return DBProductToGraphQLProduct(orderProduct.Product)
+			} else {
+				return nil
+			}
+		}(),
+		CustomProduct: func() *model.CustomProduct {
+			if orderProduct.CustomProduct != nil {
+				return DBCustomProductToGraphQLCustomProduct(orderProduct.CustomProduct)
+			} else {
+				return nil
+			}
+		}(),
 	}
 }

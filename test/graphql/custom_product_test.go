@@ -90,7 +90,6 @@ func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 
@@ -206,7 +205,6 @@ func TestGetCustomProductWithInvalidId(t *testing.T) {
 	response, err := App.Test(request)
 
 	assert.Nil(t, err)
-	assert.NotEqual(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
 

@@ -2,6 +2,8 @@ package graphql
 
 import "testing"
 
+// go test ./test/graphql -run=TestAll
+
 func TestAll(t *testing.T) {
 	t.Run("User test", func(t *testing.T) {
 		TestRegisterUserWithValidPayload(t)
