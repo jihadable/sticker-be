@@ -106,7 +106,7 @@ func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 func TestGetCustomProductsByUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			get_custom_products_by_user {
+			get_custom_products_by_customer {
 				id, name, image_url, 
 				customer { id, name, email, role, phone, address }
 			}
@@ -126,7 +126,7 @@ func TestGetCustomProductsByUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	customProducts, ok := data["get_custom_products_by_user"].([]map[string]any)
+	customProducts, ok := data["get_custom_products_by_customer"].([]map[string]any)
 	assert.True(t, ok)
 
 	customProduct := customProducts[0]

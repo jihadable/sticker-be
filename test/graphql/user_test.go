@@ -1,7 +1,9 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +16,7 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 			register(
 				name: "user test"
 				email: "usertest@gmail.com"
-				password: "test"
+				password: "test password"
 				phone: "081234567890",
 				address: "Jl. Langsat"
 			){
@@ -32,6 +34,7 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
+	fmt.Println(responseBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -143,7 +146,7 @@ func TestGetUserWithoutToken(t *testing.T) {
 	t.Log("✅")
 }
 
-func TestUpadateUser(t *testing.T) {
+func TestUpdateUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			update_user(
@@ -191,7 +194,7 @@ func TestLoginAsCustomer(t *testing.T) {
 		"query": `mutation {
 			login(
 				email: "usertest@gmail.com"
-				password: "test"
+				password: "test password"
 			){
 				token
 				user { id, name, email, role, phone, address }
@@ -236,8 +239,8 @@ func TestLoginAsAdmin(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			login(
-				email: "stickeradmin@gmail.com"
-				password: "test"
+				email: "stikeradmin@gmail.com"
+				password: "` + os.Getenv("PRIVATE_PASSWORD") + `"
 			){
 				token
 				user { id, name, email, role }
@@ -269,8 +272,8 @@ func TestLoginAsAdmin(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, user["id"])
-	assert.Equal(t, "sticker admin test", user["name"])
-	assert.Equal(t, "stickeradmin@gmail.com", user["email"])
+	assert.Equal(t, "Stiker Admin", user["name"])
+	assert.Equal(t, "stikeradmin@gmail.com", user["email"])
 	assert.Equal(t, "admin", user["role"])
 
 	t.Log("✅")

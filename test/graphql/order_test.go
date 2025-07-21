@@ -111,7 +111,7 @@ func TestPostOrderWithInvalidPayload(t *testing.T) {
 func TestGetOrdersByUser(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
-			get_orders_by_user {
+			get_orders_by_customer {
 				id, status, total_price, 
 				customer { id, name, email, role, phone, address }, 
 				products { id, name, price, stock, image_url, description }

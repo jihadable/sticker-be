@@ -51,7 +51,7 @@ func (service *NotificationServiceImpl) GetNotificationById(id string) (*models.
 	}
 
 	notification := models.Notification{}
-	err = service.DB.Where("id = ?", id).Preload("User").First(&notification).Error
+	err = service.DB.Where("id = ?", id).First(&notification).Error
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +65,6 @@ func (service *NotificationServiceImpl) GetNotificationById(id string) (*models.
 	return &notification, nil
 }
 
-func NewNotificationService(db *gorm.DB, redis *redis.Client) NotificationService {
-	return &NotificationServiceImpl{DB: db, Redis: redis}
+func NewNotificationService(db *gorm.DB, redis *redis.Client, notificationRecipientService NotificationRecipientService) NotificationService {
+	return &NotificationServiceImpl{DB: db, Redis: redis, NotificationRecipientService: notificationRecipientService}
 }

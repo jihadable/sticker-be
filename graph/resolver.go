@@ -15,9 +15,7 @@ type Resolver struct {
 	services.CartService
 	services.CartProductService
 	services.OrderService
-	services.OrderProductService
 	services.ConversationService
 	services.MessageService
 	services.NotificationService
-	services.NotificationRecipientService
 }

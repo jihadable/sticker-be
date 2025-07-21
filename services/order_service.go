@@ -70,6 +70,6 @@ func (service *OrderServiceImpl) UpdateOrderById(id string, updatedOrder *models
 	return service.GetOrderById(order.Id)
 }
 
-func NewOrderService(db *gorm.DB, redis *redis.Client) OrderService {
-	return &OrderServiceImpl{DB: db, Redis: redis}
+func NewOrderService(db *gorm.DB, redis *redis.Client, orderProductService OrderProductService) OrderService {
+	return &OrderServiceImpl{DB: db, Redis: redis, OrderProductService: orderProductService}
 }

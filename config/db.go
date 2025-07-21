@@ -32,20 +32,6 @@ func DB() *gorm.DB {
 		panic("Failed to connect to database: " + err.Error())
 	}
 
-	db.Migrator().DropTable(
-		&models.User{},
-		&models.Product{},
-		&models.CustomProduct{},
-		&models.Category{},
-		&models.ProductCategory{},
-		&models.Cart{},
-		&models.CartProduct{},
-		&models.Order{},
-		&models.OrderProduct{},
-		&models.Conversation{},
-		&models.Message{},
-		&models.Notification{},
-	)
 	db.AutoMigrate(
 		&models.User{},
 		&models.Product{},
@@ -59,6 +45,7 @@ func DB() *gorm.DB {
 		&models.Conversation{},
 		&models.Message{},
 		&models.Notification{},
+		&models.NotificationRecipient{},
 	)
 
 	return db

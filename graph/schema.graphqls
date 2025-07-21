@@ -230,6 +230,7 @@ type Mutation {
 		quantity: Int!
 		size: Size!
 	): CartProduct!
+	delete_cart_product(id: ID!): Boolean!
 
 	# order
 	create_order(order_items: [OrderItem]!, total_price: Int!): Order!

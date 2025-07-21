@@ -37,10 +37,10 @@ func TestApp() *fiber.App {
 			ProductCategoryService: services.NewProductCategoryService(db, redis),
 			CartService:            services.NewCartService(db, redis),
 			CartProductService:     services.NewCartProductService(db, redis),
-			OrderService:           services.NewOrderService(db, redis),
-			OrderProductService:    services.NewOrderProductService(db, redis),
+			OrderService:           services.NewOrderService(db, redis, services.NewOrderProductService(db, redis)),
 			ConversationService:    services.NewConversationService(db, redis),
 			MessageService:         services.NewMessageService(db, redis),
+			NotificationService:    services.NewNotificationService(db, redis, services.NewNotificationRecipientService(db, redis)),
 		}}))
 
 		handler.AddTransport(transport.POST{})
@@ -65,4 +65,4 @@ var ProductId, CustomProductId string
 var CategoryId string
 var ConversationId string
 var OrderId string
-var CartId string
+var CartId, CartProductId string

@@ -342,6 +342,22 @@ func (r *mutationResolver) UpdateCartProduct(ctx context.Context, id string, qua
 	return mapper.DBCartProductToGraphQLCartProduct(cartProduct), nil
 }
 
+// DeleteCartProduct is the resolver for the delete_cart_product field.
+func (r *mutationResolver) DeleteCartProduct(ctx context.Context, id string) (bool, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
+	if err != nil {
+		return false, err
+	}
+
+	err = r.CartProductService.DeleteCartProductById(id)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // CreateOrder is the resolver for the create_order field.
 func (r *mutationResolver) CreateOrder(ctx context.Context, orderItems []*model.OrderItem, totalPrice int32) (*model.Order, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
