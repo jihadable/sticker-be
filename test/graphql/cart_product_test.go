@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -54,7 +55,7 @@ func TestCreateCartProductWithProduct(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateCartProductWithProduct: ✅")
 }
 
 func TestCreateCartProductWithCustomProduct(t *testing.T) {
@@ -99,7 +100,7 @@ func TestCreateCartProductWithCustomProduct(t *testing.T) {
 	assert.NotEmpty(t, customProduct["name"])
 	assert.NotEmpty(t, customProduct["image_url"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateCartProductWithCustomProduct: ✅")
 }
 
 func TestCreateCartProductWithInvalidPayload(t *testing.T) {
@@ -127,7 +128,7 @@ func TestCreateCartProductWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateCartProductWithInvalidPayload: ✅")
 }
 
 func TestUpdateCartProduct(t *testing.T) {
@@ -174,7 +175,7 @@ func TestUpdateCartProduct(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	t.Log("✅")
+	fmt.Println("TestUpdateCartProduct: ✅")
 }
 
 func TestDeleteCartProduct(t *testing.T) {
@@ -201,5 +202,5 @@ func TestDeleteCartProduct(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, deleteCartProduct)
 
-	t.Log("✅")
+	fmt.Println("TestDeleteCartProduct: ✅")
 }

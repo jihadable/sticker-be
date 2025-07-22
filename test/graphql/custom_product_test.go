@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http/httptest"
@@ -71,7 +72,7 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateCustomProductWithValidPayload1: ✅")
 }
 
 func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
@@ -99,10 +100,10 @@ func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateCustomProductWithInvalidPayload: ✅")
 }
 
-func TestGetCustomProductsByUser(t *testing.T) {
+func TestGetCustomProductsByCustomer(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
 			get_custom_products_by_customer {
@@ -143,7 +144,7 @@ func TestGetCustomProductsByUser(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	t.Log("✅")
+	fmt.Println("TestGetCustomProductsByCustomer: ✅")
 }
 
 func TestGetCustomProductWithValidId(t *testing.T) {
@@ -186,7 +187,7 @@ func TestGetCustomProductWithValidId(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	t.Log("✅")
+	fmt.Println("TestGetCustomProductWithValidId: ✅")
 }
 
 func TestGetCustomProductWithInvalidId(t *testing.T) {
@@ -214,7 +215,7 @@ func TestGetCustomProductWithInvalidId(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestGetCustomProductWithInvalidId: ✅")
 }
 
 func TestUpdateCustomProduct(t *testing.T) {
@@ -274,7 +275,7 @@ func TestUpdateCustomProduct(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	t.Log("✅")
+	fmt.Println("TestUpdateCustomProduct: ✅")
 }
 
 func TestDeleteCustomProduct(t *testing.T) {
@@ -301,7 +302,7 @@ func TestDeleteCustomProduct(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, deleteProduct)
 
-	t.Log("✅")
+	fmt.Println("TestDeleteCustomProduct: ✅")
 }
 
 func TestCreateCustomProductWithValidPayload2(t *testing.T) {
@@ -362,5 +363,5 @@ func TestCreateCustomProductWithValidPayload2(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateCustomProductWithValidPayload2: ✅")
 }

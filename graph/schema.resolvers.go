@@ -50,7 +50,7 @@ func (r *mutationResolver) Register(ctx context.Context, name string, email stri
 	newMessage, err := r.MessageService.AddMessage(&models.Message{
 		ConversationId: conversation.Id,
 		SenderId:       admin.Id,
-		Message:        "Selamat datang di stikerin",
+		Message:        "Welcome to stikerin",
 	})
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (r *mutationResolver) Register(ctx context.Context, name string, email stri
 	notification, err := r.NotificationService.AddNotification(&models.Notification{
 		Type:        "new_message",
 		RecipientId: user.Id,
-		Title:       "Selamat datang di stikerin",
+		Title:       "Welcome to stikerin",
 		Message:     newMessage.Message,
 	})
 	if err != nil {
@@ -433,7 +433,7 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID str
 	notification, err := r.NotificationService.AddNotification(&models.Notification{
 		Type:        "new_message",
 		RecipientId: notifcationRecipientId,
-		Title:       "Pesan baru",
+		Title:       "New message",
 		Message:     newMessage.Message,
 	})
 	if err != nil {

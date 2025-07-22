@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -37,7 +38,7 @@ func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	CategoryId = category["id"].(string)
 	assert.Empty(t, category["products"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateCategoryWithValidPayload1: ✅")
 }
 
 func TestCreateCategoryWithInvalidPayload(t *testing.T) {
@@ -64,7 +65,7 @@ func TestCreateCategoryWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateCategoryWithInvalidPayload: ✅")
 }
 
 func TestGetCategories(t *testing.T) {
@@ -95,7 +96,7 @@ func TestGetCategories(t *testing.T) {
 	assert.NotEmpty(t, category["id"])
 	assert.Empty(t, category["products"])
 
-	t.Log("✅")
+	fmt.Println("TestGetCategories: ✅")
 }
 
 func TestGetCategoryWithValidId(t *testing.T) {
@@ -125,7 +126,7 @@ func TestGetCategoryWithValidId(t *testing.T) {
 	assert.Equal(t, CategoryId, category["id"])
 	assert.Empty(t, category["products"])
 
-	t.Log("✅")
+	fmt.Println("TestGetCategoryWithValidId: ✅")
 }
 
 func TestGetCategoryWithInvalidId(t *testing.T) {
@@ -151,7 +152,7 @@ func TestGetCategoryWithInvalidId(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestGetCategoryWithInvalidId: ✅")
 }
 
 func TestDeleteCategory(t *testing.T) {
@@ -178,7 +179,7 @@ func TestDeleteCategory(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, deleteCategory)
 
-	t.Log("✅")
+	fmt.Println("TestDeleteCategory: ✅")
 }
 
 func TestCreateCategoryWithValidPayload2(t *testing.T) {
@@ -210,5 +211,5 @@ func TestCreateCategoryWithValidPayload2(t *testing.T) {
 	CategoryId = postCategory["id"].(string)
 	assert.Empty(t, postCategory["products"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateCategoryWithValidPayload2: ✅")
 }

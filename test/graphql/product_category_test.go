@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -49,7 +50,7 @@ func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 
 	assert.NotEmpty(t, category["id"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateProductCategoryWithValidPayload: ✅")
 }
 
 func TestCreateProductCategoryWithInvalidPayload(t *testing.T) {
@@ -77,7 +78,7 @@ func TestCreateProductCategoryWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateProductCategoryWithInvalidPayload: ✅")
 }
 
 func TestDeleteProductCategory(t *testing.T) {
@@ -104,5 +105,5 @@ func TestDeleteProductCategory(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, deleteProductCategory)
 
-	t.Log("✅")
+	fmt.Println("TestDeleteProductCategory: ✅")
 }

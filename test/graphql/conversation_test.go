@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -34,5 +35,5 @@ func TestGetConversationByUser(t *testing.T) {
 	assert.NotEmpty(t, conversation["id"])
 	ConversationId = conversation["id"].(string)
 
-	t.Log("✅")
+	fmt.Println("TestGetConversationByUser: ✅")
 }

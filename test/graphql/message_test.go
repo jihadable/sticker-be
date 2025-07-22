@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -47,7 +48,7 @@ func TestCreateMessageWithoutReply(t *testing.T) {
 	assert.NotEmpty(t, sender["phone"])
 	assert.NotEmpty(t, sender["address"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateMessageWithoutReply: ✅")
 }
 
 func TestCreateMessageWithInvalidPayload(t *testing.T) {
@@ -75,7 +76,7 @@ func TestCreateMessageWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateMessageWithInvalidPayload: ✅")
 }
 
 func TestCreateMessageWithProductReply(t *testing.T) {
@@ -128,7 +129,7 @@ func TestCreateMessageWithProductReply(t *testing.T) {
 	assert.NotEmpty(t, sender["phone"])
 	assert.NotEmpty(t, sender["address"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateMessageWithProductReply: ✅")
 }
 
 func TestCreateMessageWithCustomProductReply(t *testing.T) {
@@ -178,5 +179,5 @@ func TestCreateMessageWithCustomProductReply(t *testing.T) {
 	assert.NotEmpty(t, sender["phone"])
 	assert.NotEmpty(t, sender["address"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateMessageWithCustomProductReply: ✅")
 }

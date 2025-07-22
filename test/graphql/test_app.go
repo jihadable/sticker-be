@@ -66,3 +66,4 @@ var CategoryId string
 var ConversationId string
 var OrderId string
 var CartId, CartProductId string
+var NotificationId string

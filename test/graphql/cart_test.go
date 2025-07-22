@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -50,5 +51,5 @@ func TestGetCartByCustomer(t *testing.T) {
 
 	assert.Empty(t, cart["products"])
 
-	t.Log("✅")
+	fmt.Println("TestGetCartByCustomer: ✅")
 }

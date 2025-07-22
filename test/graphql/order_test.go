@@ -77,6 +77,8 @@ func TestCreateOrderWithValidPayload(t *testing.T) {
 	assert.NotEmpty(t, product["stock"])
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
+
+	fmt.Println("TestCreateOrderWithValidPayload ✅")
 }
 
 func TestCreateOrderWithInvalidPayload(t *testing.T) {
@@ -105,10 +107,10 @@ func TestCreateOrderWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateOrderWithInvalidPayload: ✅")
 }
 
-func TestGetOrdersByUser(t *testing.T) {
+func TestGetOrdersByCustomer(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `query {
 			get_orders_by_customer {
@@ -162,7 +164,7 @@ func TestGetOrdersByUser(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	t.Log("✅")
+	fmt.Println("TestGetOrdersByCustomer: ✅")
 }
 
 func TestGetOrderWithValidId(t *testing.T) {
@@ -217,7 +219,7 @@ func TestGetOrderWithValidId(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	t.Log("✅")
+	fmt.Println("TestGetOrderWithValidId: ✅")
 }
 
 func TestGetOrderWithInvalidId(t *testing.T) {
@@ -246,7 +248,7 @@ func TestGetOrderWithInvalidId(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestGetOrderWithInvalidId: ✅")
 }
 
 func TestUpdateOrder(t *testing.T) {
@@ -269,7 +271,6 @@ func TestUpdateOrder(t *testing.T) {
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
-	fmt.Println(responseBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -302,5 +303,5 @@ func TestUpdateOrder(t *testing.T) {
 	assert.NotEmpty(t, product["image_url"])
 	assert.NotEmpty(t, product["description"])
 
-	t.Log("✅")
+	fmt.Println("TestUpdateOrder: ✅")
 }

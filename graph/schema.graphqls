@@ -133,7 +133,7 @@ type Message {
 type Notification {
 	id: ID!
 	type: String!
-	recipient_id: ID!
+	# recipient_id: ID!
 	title: String!
 	message: String!
 	is_read: Boolean!

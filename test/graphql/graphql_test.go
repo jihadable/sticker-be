@@ -1,13 +1,15 @@
 package graphql
 
-import "testing"
+import (
+	"testing"
+)
 
 // go test ./test/graphql -run=TestAll
 
 func TestAll(t *testing.T) {
 	t.Run("User test", func(t *testing.T) {
-		TestRegisterUserWithValidPayload(t)
-		TestPostUserWithInvalidPayload(t)
+		TestRegisterWithValidPayload(t)
+		TestRegisterWithInvalidPayload(t)
 		TestGetUserWithToken(t)
 		TestGetUserWithoutToken(t)
 		TestUpdateUser(t)
@@ -30,7 +32,7 @@ func TestAll(t *testing.T) {
 	t.Run("Custom product test", func(t *testing.T) {
 		TestCreateCustomProductWithValidPayload1(t)
 		TestCreateCustomProductWithInvalidPayload(t)
-		TestGetCustomProductsByUser(t)
+		TestGetCustomProductsByCustomer(t)
 		TestGetCustomProductWithValidId(t)
 		TestGetCustomProductWithInvalidId(t)
 		TestUpdateCustomProduct(t)
@@ -80,9 +82,16 @@ func TestAll(t *testing.T) {
 	t.Run("Order test", func(t *testing.T) {
 		TestCreateOrderWithValidPayload(t)
 		TestCreateOrderWithInvalidPayload(t)
-		TestGetOrdersByUser(t)
+		TestGetOrdersByCustomer(t)
 		TestGetOrderWithValidId(t)
 		TestGetOrderWithInvalidId(t)
 		TestUpdateOrder(t)
+	})
+
+	t.Run("Notification test", func(t *testing.T) {
+		TestGetNotificationsByRecipient(t)
+		TestReadNotificationByValidId(t)
+		TestReadNotificationByInvalidId(t)
+		TestReadAllNotifications(t)
 	})
 }

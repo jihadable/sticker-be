@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http/httptest"
@@ -65,7 +66,7 @@ func TestCreateProductWithValidPayload1(t *testing.T) {
 	assert.Equal(t, "desc test", product["description"])
 	assert.Empty(t, product["categories"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateProductWithValidPayload1: ✅")
 }
 
 func TestCreateProductWithInvalidPayload(t *testing.T) {
@@ -93,7 +94,7 @@ func TestCreateProductWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestCreateProductWithInvalidPayload: ✅")
 }
 
 func TestGetProducts(t *testing.T) {
@@ -130,7 +131,7 @@ func TestGetProducts(t *testing.T) {
 	assert.NotEmpty(t, product["description"])
 	assert.Empty(t, product["categories"])
 
-	t.Log("✅")
+	fmt.Println("TestGetProducts: ✅")
 }
 
 func TestGetProductWithValidId(t *testing.T) {
@@ -166,7 +167,7 @@ func TestGetProductWithValidId(t *testing.T) {
 	assert.NotEmpty(t, product["description"])
 	assert.Empty(t, product["categories"])
 
-	t.Log("✅")
+	fmt.Println("TestGetProductWithValidId: ✅")
 }
 
 func TestGetProductWithInvalidId(t *testing.T) {
@@ -193,7 +194,7 @@ func TestGetProductWithInvalidId(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestGetProductWithInvalidId: ✅")
 }
 
 func TestUpdateProduct(t *testing.T) {
@@ -247,7 +248,7 @@ func TestUpdateProduct(t *testing.T) {
 	assert.Equal(t, "update desc test", product["description"])
 	assert.Empty(t, product["categories"])
 
-	t.Log("✅")
+	fmt.Println("TestUpdateProduct: ✅")
 }
 
 func TestDeleteProduct(t *testing.T) {
@@ -274,7 +275,7 @@ func TestDeleteProduct(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, deleteProduct)
 
-	t.Log("✅")
+	fmt.Println("TestDeleteProduct: ✅")
 }
 
 func TestCreateProductWithValidPayload2(t *testing.T) {
@@ -329,5 +330,5 @@ func TestCreateProductWithValidPayload2(t *testing.T) {
 	assert.Equal(t, "desc test", product["description"])
 	assert.Empty(t, product["categories"])
 
-	t.Log("✅")
+	fmt.Println("TestCreateProductWithValidPayload2: ✅")
 }

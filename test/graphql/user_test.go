@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -9,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRegisterUserWithValidPayload(t *testing.T) {
+func TestRegisterWithValidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			register(
@@ -55,10 +56,10 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 	assert.Equal(t, "081234567890", user["phone"])
 	assert.Equal(t, "Jl. Langsat", user["address"])
 
-	t.Log("✅")
+	fmt.Println("TestRegisterWithValidPayload: ✅")
 }
 
-func TestPostUserWithInvalidPayload(t *testing.T) {
+func TestRegisterWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			register(){
@@ -82,7 +83,7 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestRegisterWithInvalidPayload: ✅")
 }
 
 func TestGetUserWithToken(t *testing.T) {
@@ -115,7 +116,7 @@ func TestGetUserWithToken(t *testing.T) {
 	assert.Equal(t, "081234567890", user["phone"])
 	assert.Equal(t, "Jl. Langsat", user["address"])
 
-	t.Log("✅")
+	fmt.Println("TestGetUserWithToken: ✅")
 }
 
 func TestGetUserWithoutToken(t *testing.T) {
@@ -139,7 +140,7 @@ func TestGetUserWithoutToken(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestGetUserWithoutToken: ✅")
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -175,7 +176,7 @@ func TestUpdateUser(t *testing.T) {
 	assert.Equal(t, "081122334455", user["phone"])
 	assert.Equal(t, "Jl. Durian", user["address"])
 
-	t.Log("✅")
+	fmt.Println("TestUpdateUser: ✅")
 }
 
 func TestLoginAsCustomer(t *testing.T) {
@@ -221,7 +222,7 @@ func TestLoginAsCustomer(t *testing.T) {
 	assert.Equal(t, "081122334455", user["phone"])
 	assert.Equal(t, "Jl. Durian", user["address"])
 
-	t.Log("✅")
+	fmt.Println("TestLoginAsCustomer: ✅")
 }
 
 func TestLoginAsAdmin(t *testing.T) {
@@ -265,7 +266,7 @@ func TestLoginAsAdmin(t *testing.T) {
 	assert.Equal(t, "stikeradmin@gmail.com", user["email"])
 	assert.Equal(t, "admin", user["role"])
 
-	t.Log("✅")
+	fmt.Println("TestLoginAsAdmin: ✅")
 }
 
 func TestLoginWithInvalidPayload(t *testing.T) {
@@ -292,5 +293,5 @@ func TestLoginWithInvalidPayload(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotEmpty(t, errors)
 
-	t.Log("✅")
+	fmt.Println("TestLoginWithInvalidPayload: ✅")
 }
