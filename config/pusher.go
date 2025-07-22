@@ -13,7 +13,7 @@ type Pusher interface {
 }
 
 type PusherImpl struct {
-	pusher.Client
+	*pusher.Client
 }
 
 func (pusher *PusherImpl) MessageTrigger(eventName string, data any) error {
@@ -29,7 +29,7 @@ func (pusher *PusherImpl) NotificationTrigger(eventName string, data any) error 
 }
 
 func NewPusher() Pusher {
-	return &PusherImpl{Client: pusher.Client{
+	return &PusherImpl{Client: &pusher.Client{
 		AppID:   os.Getenv("PUSHER_APP_ID"),
 		Key:     os.Getenv("PUSHER_KEY"),
 		Secret:  os.Getenv("PUSHER_SECRET"),
