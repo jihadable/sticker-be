@@ -27,6 +27,7 @@ func TestApp() *fiber.App {
 
 	db := config.DB()
 	redis := config.Redis()
+	pusher := config.NewPusher()
 
 	app.All("/graphql", func(c *fiber.Ctx) error {
 		handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
@@ -41,6 +42,7 @@ func TestApp() *fiber.App {
 			ConversationService:    services.NewConversationService(db, redis),
 			MessageService:         services.NewMessageService(db, redis),
 			NotificationService:    services.NewNotificationService(db, redis),
+			Pusher:                 pusher,
 		}}))
 
 		handler.AddTransport(transport.POST{})

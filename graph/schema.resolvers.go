@@ -8,7 +8,6 @@ import (
 	"context"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/jihadable/sticker-be/config"
 	"github.com/jihadable/sticker-be/graph/model"
 	"github.com/jihadable/sticker-be/models"
 	"github.com/jihadable/sticker-be/utils"
@@ -66,12 +65,12 @@ func (r *mutationResolver) Register(ctx context.Context, name string, email stri
 		return nil, err
 	}
 
-	err = config.MessageTrigger("new_message", mapper.DBMessageToGraphQLMessage(newMessage))
+	err = r.Pusher.MessageTrigger("new_message", mapper.DBMessageToGraphQLMessage(newMessage))
 	if err != nil {
 		return nil, err
 	}
 
-	err = config.NotificationTrigger("new_notification_"+user.Id, mapper.DBNotificationToGraphQLNotification(notification))
+	err = r.Pusher.NotificationTrigger("new_notification_"+user.Id, mapper.DBNotificationToGraphQLNotification(notification))
 	if err != nil {
 		return nil, err
 	}
@@ -440,12 +439,12 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID str
 		return nil, err
 	}
 
-	err = config.MessageTrigger("new_message", mapper.DBMessageToGraphQLMessage(newMessage))
+	err = r.Pusher.MessageTrigger("new_message", mapper.DBMessageToGraphQLMessage(newMessage))
 	if err != nil {
 		return nil, err
 	}
 
-	err = config.NotificationTrigger("new_notification_"+notifcationRecipientId, mapper.DBNotificationToGraphQLNotification(notification))
+	err = r.Pusher.NotificationTrigger("new_notification_"+notifcationRecipientId, mapper.DBNotificationToGraphQLNotification(notification))
 	if err != nil {
 		return nil, err
 	}

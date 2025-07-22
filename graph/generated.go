@@ -119,13 +119,12 @@ type ComplexityRoot struct {
 	}
 
 	Notification struct {
-		ID          func(childComplexity int) int
-		IsRead      func(childComplexity int) int
-		Message     func(childComplexity int) int
-		Recipient   func(childComplexity int) int
-		RecipientID func(childComplexity int) int
-		Title       func(childComplexity int) int
-		Type        func(childComplexity int) int
+		ID        func(childComplexity int) int
+		IsRead    func(childComplexity int) int
+		Message   func(childComplexity int) int
+		Recipient func(childComplexity int) int
+		Title     func(childComplexity int) int
+		Type      func(childComplexity int) int
 	}
 
 	Order struct {
@@ -701,13 +700,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Notification.Recipient(childComplexity), true
-
-	case "Notification.recipient_id":
-		if e.complexity.Notification.RecipientID == nil {
-			break
-		}
-
-		return e.complexity.Notification.RecipientID(childComplexity), true
 
 	case "Notification.title":
 		if e.complexity.Notification.Title == nil {
@@ -5122,50 +5114,6 @@ func (ec *executionContext) fieldContext_Notification_type(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Notification_recipient_id(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Notification_recipient_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RecipientID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Notification_recipient_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Notification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Notification_title(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Notification_title(ctx, field)
 	if err != nil {
@@ -7070,8 +7018,6 @@ func (ec *executionContext) fieldContext_Query_get_notifications_by_recipient(_ 
 				return ec.fieldContext_Notification_id(ctx, field)
 			case "type":
 				return ec.fieldContext_Notification_type(ctx, field)
-			case "recipient_id":
-				return ec.fieldContext_Notification_recipient_id(ctx, field)
 			case "title":
 				return ec.fieldContext_Notification_title(ctx, field)
 			case "message":
@@ -10163,11 +10109,6 @@ func (ec *executionContext) _Notification(ctx context.Context, sel ast.Selection
 			}
 		case "type":
 			out.Values[i] = ec._Notification_type(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "recipient_id":
-			out.Values[i] = ec._Notification_recipient_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

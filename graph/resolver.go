@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/jihadable/sticker-be/services"
+import (
+	"github.com/jihadable/sticker-be/config"
+	"github.com/jihadable/sticker-be/services"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -18,4 +21,5 @@ type Resolver struct {
 	services.ConversationService
 	services.MessageService
 	services.NotificationService
+	config.Pusher
 }
