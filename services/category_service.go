@@ -101,8 +101,8 @@ func (service *CategoryServiceImpl) DeleteCategoryById(id string) error {
 		return err
 	}
 
-	cacheKey := "category:" + id
-	service.Redis.Del(context.Background(), cacheKey)
+	cacheKeys := []string{"category:" + id, "categories"}
+	service.Redis.Del(context.Background(), cacheKeys...)
 
 	return nil
 }

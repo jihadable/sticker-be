@@ -59,10 +59,7 @@ func (service *OrderServiceImpl) UpdateOrderById(id string, updatedOrder *models
 		return nil, err
 	}
 
-	order.Status = updatedOrder.Status
-	order.TotalPrice = updatedOrder.TotalPrice
-
-	err = service.DB.Save(order).Error
+	err = service.DB.Model(&models.Order{}).Where("id = ?", id).Update("status", updatedOrder.Status).Error
 	if err != nil {
 		return nil, err
 	}

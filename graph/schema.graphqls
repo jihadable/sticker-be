@@ -181,7 +181,7 @@ type Query {
 	get_conversation_by_user: Conversation
 
 	# notification
-	get_notifications_by_user: [Notification]!
+	get_notifications_by_recipient: [Notification]!
 }
 
 type Mutation {

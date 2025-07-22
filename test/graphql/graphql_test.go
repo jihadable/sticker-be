@@ -78,8 +78,8 @@ func TestAll(t *testing.T) {
 	})
 
 	t.Run("Order test", func(t *testing.T) {
-		TestPostOrderWithValidPayload(t)
-		TestPostOrderWithInvalidPayload(t)
+		TestCreateOrderWithValidPayload(t)
+		TestCreateOrderWithInvalidPayload(t)
 		TestGetOrdersByUser(t)
 		TestGetOrderWithValidId(t)
 		TestGetOrderWithInvalidId(t)

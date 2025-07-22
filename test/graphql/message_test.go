@@ -82,7 +82,8 @@ func TestCreateMessageWithProductReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			create_message(conversation_id: "` + ConversationId + `", product_id: "` + ProductId + `", message: "test message"){
-				id, product, message,
+				id, message,
+				product { id, name, price, stock, image_url, description }
 				sender { id, name, email, role, phone, address }
 			}
 		}`,
@@ -134,7 +135,8 @@ func TestCreateMessageWithCustomProductReply(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			create_message(conversation_id: "` + ConversationId + `", custom_product_id: "` + CustomProductId + `", message: "test message"){
-				id, custom_product, message, 
+				id, message, 
+				custom_product { id, name, image_url }
 				sender { id, name, email, role, phone, address }
 			}
 		}`,

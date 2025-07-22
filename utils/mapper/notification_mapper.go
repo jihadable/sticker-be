@@ -1,13 +1,23 @@
 package mapper
 
-import "github.com/jihadable/sticker-be/models"
+import (
+	"github.com/jihadable/sticker-be/graph/model"
+	"github.com/jihadable/sticker-be/models"
+)
 
-func NotificationMapper(notification *models.Notification) map[string]any {
-	return map[string]any{
-		"type":         notification.Type,
-		"recipient_id": notification.RecipientId,
-		"title":        notification.Title,
-		"message":      notification.Message,
-		"is_read":      notification.IsRead,
+func DBNotificationToGraphQLNotification(notification *models.Notification) *model.Notification {
+	return &model.Notification{
+		ID:      notification.Id,
+		Type:    notification.Type,
+		Title:   notification.Title,
+		Message: notification.Message,
+		IsRead:  notification.IsRead,
+		Recipient: func() *model.User {
+			if notification.Recipient != nil {
+				return DBUserToGraphQLUser(notification.Recipient)
+			} else {
+				return nil
+			}
+		}(),
 	}
 }

@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPostOrderWithValidPayload(t *testing.T) {
+func TestCreateOrderWithValidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			create_order(
@@ -16,13 +17,13 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 					{
 						product_id: "` + ProductId + `"
 						quantity: 2
-						size: "M"
+						size: M
 						subtotal_price: 5000
 					},
 					{
 						custom_product_id: "` + CustomProductId + `"
 						quantity: 3
-						size: "L"
+						size: L
 						subtotal_price: 7500
 					}
 				],
@@ -53,8 +54,8 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 
 	assert.NotEmpty(t, order["id"])
 	OrderId = order["id"].(string)
-	assert.NotEmpty(t, order["status"])
-	assert.NotEmpty(t, order["total_price"])
+	assert.Equal(t, "Pending confirmation", order["status"])
+	assert.Equal(t, float64(12500), order["total_price"])
 
 	customer, ok := order["customer"].(map[string]any)
 	assert.True(t, ok)
@@ -66,10 +67,10 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	products, ok := order["products"].([]map[string]any)
+	products, ok := order["products"].([]any)
 	assert.True(t, ok)
 
-	product := products[0]
+	product := products[0].(map[string]any)
 	assert.NotEmpty(t, product["id"])
 	assert.NotEmpty(t, product["name"])
 	assert.NotEmpty(t, product["price"])
@@ -78,7 +79,7 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 	assert.NotEmpty(t, product["description"])
 }
 
-func TestPostOrderWithInvalidPayload(t *testing.T) {
+func TestCreateOrderWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
 			create_order(){
@@ -131,10 +132,10 @@ func TestGetOrdersByUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	orders, ok := data["get_orders_by_user"].([]map[string]any)
+	orders, ok := data["get_orders_by_customer"].([]any)
 	assert.True(t, ok)
 
-	order := orders[0]
+	order := orders[0].(map[string]any)
 
 	assert.NotEmpty(t, order["id"])
 	assert.NotEmpty(t, order["status"])
@@ -150,10 +151,10 @@ func TestGetOrdersByUser(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	products, ok := order["products"].([]map[string]any)
+	products, ok := order["products"].([]any)
 	assert.True(t, ok)
 
-	product := products[0]
+	product := products[0].(map[string]any)
 	assert.NotEmpty(t, product["id"])
 	assert.NotEmpty(t, product["name"])
 	assert.NotEmpty(t, product["price"])
@@ -192,8 +193,8 @@ func TestGetOrderWithValidId(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, order["id"])
-	assert.NotEmpty(t, order["status"])
-	assert.NotEmpty(t, order["total_price"])
+	assert.Equal(t, "Pending confirmation", order["status"])
+	assert.Equal(t, float64(12500), order["total_price"])
 
 	customer, ok := order["customer"].(map[string]any)
 	assert.True(t, ok)
@@ -205,10 +206,10 @@ func TestGetOrderWithValidId(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	products, ok := order["products"].([]map[string]any)
+	products, ok := order["products"].([]any)
 	assert.True(t, ok)
 
-	product := products[0]
+	product := products[0].(map[string]any)
 	assert.NotEmpty(t, product["id"])
 	assert.NotEmpty(t, product["name"])
 	assert.NotEmpty(t, product["price"])
@@ -268,6 +269,7 @@ func TestUpdateOrder(t *testing.T) {
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
+	fmt.Println(responseBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -276,8 +278,8 @@ func TestUpdateOrder(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, order["id"])
-	assert.NotEmpty(t, order["status"])
-	assert.NotEmpty(t, order["total_price"])
+	assert.Equal(t, "Completed", order["status"])
+	assert.Equal(t, float64(12500), order["total_price"])
 
 	customer, ok := order["customer"].(map[string]any)
 	assert.True(t, ok)
@@ -289,10 +291,10 @@ func TestUpdateOrder(t *testing.T) {
 	assert.NotEmpty(t, customer["phone"])
 	assert.NotEmpty(t, customer["address"])
 
-	products, ok := order["products"].([]map[string]any)
+	products, ok := order["products"].([]any)
 	assert.True(t, ok)
 
-	product := products[0]
+	product := products[0].(map[string]any)
 	assert.NotEmpty(t, product["id"])
 	assert.NotEmpty(t, product["name"])
 	assert.NotEmpty(t, product["price"])

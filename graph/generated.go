@@ -168,7 +168,7 @@ type ComplexityRoot struct {
 		GetConversationByUser       func(childComplexity int) int
 		GetCustomProduct            func(childComplexity int, id string) int
 		GetCustomProductsByCustomer func(childComplexity int) int
-		GetNotificationsByUser      func(childComplexity int) int
+		GetNotificationsByRecipient func(childComplexity int) int
 		GetOrder                    func(childComplexity int, id string) int
 		GetOrdersByCustomer         func(childComplexity int) int
 		GetProduct                  func(childComplexity int, id string) int
@@ -223,7 +223,7 @@ type QueryResolver interface {
 	GetOrder(ctx context.Context, id string) (*model.Order, error)
 	GetOrdersByCustomer(ctx context.Context) ([]*model.Order, error)
 	GetConversationByUser(ctx context.Context) (*model.Conversation, error)
-	GetNotificationsByUser(ctx context.Context) ([]*model.Notification, error)
+	GetNotificationsByRecipient(ctx context.Context) ([]*model.Notification, error)
 }
 
 type executableSchema struct {
@@ -922,12 +922,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.GetCustomProductsByCustomer(childComplexity), true
 
-	case "Query.get_notifications_by_user":
-		if e.complexity.Query.GetNotificationsByUser == nil {
+	case "Query.get_notifications_by_recipient":
+		if e.complexity.Query.GetNotificationsByRecipient == nil {
 			break
 		}
 
-		return e.complexity.Query.GetNotificationsByUser(childComplexity), true
+		return e.complexity.Query.GetNotificationsByRecipient(childComplexity), true
 
 	case "Query.get_order":
 		if e.complexity.Query.GetOrder == nil {
@@ -7027,8 +7027,8 @@ func (ec *executionContext) fieldContext_Query_get_conversation_by_user(_ contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_get_notifications_by_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_get_notifications_by_user(ctx, field)
+func (ec *executionContext) _Query_get_notifications_by_recipient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_get_notifications_by_recipient(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7041,7 +7041,7 @@ func (ec *executionContext) _Query_get_notifications_by_user(ctx context.Context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetNotificationsByUser(rctx)
+		return ec.resolvers.Query().GetNotificationsByRecipient(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7058,7 +7058,7 @@ func (ec *executionContext) _Query_get_notifications_by_user(ctx context.Context
 	return ec.marshalNNotification2ᚕᚖgithubᚗcomᚋjihadableᚋstickerᚑbeᚋgraphᚋmodelᚐNotification(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_get_notifications_by_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_get_notifications_by_recipient(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -10707,7 +10707,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "get_notifications_by_user":
+		case "get_notifications_by_recipient":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10716,7 +10716,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_get_notifications_by_user(ctx, field)
+				res = ec._Query_get_notifications_by_recipient(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

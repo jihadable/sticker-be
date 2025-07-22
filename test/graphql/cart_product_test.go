@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -33,7 +32,6 @@ func TestCreateCartProductWithProduct(t *testing.T) {
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
-	fmt.Println(responseBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -66,7 +64,7 @@ func TestCreateCartProductWithCustomProduct(t *testing.T) {
 				cart_id: "` + CartId + `"
 				custom_product_id: "` + CustomProductId + `"
 				quantity: 2
-				size: "XL"
+				size: XL
 			){
 				id, quantity, size,
 				custom_product { id, name, image_url }	
@@ -91,7 +89,7 @@ func TestCreateCartProductWithCustomProduct(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, cartProduct["id"])
-	assert.Equal(t, float64(1), cartProduct["quantity"])
+	assert.Equal(t, float64(2), cartProduct["quantity"])
 	assert.Equal(t, "XL", cartProduct["size"])
 
 	customProduct, ok := cartProduct["custom_product"].(map[string]any)
@@ -107,12 +105,7 @@ func TestCreateCartProductWithCustomProduct(t *testing.T) {
 func TestCreateCartProductWithInvalidPayload(t *testing.T) {
 	requestBody := RequestBodyParser(map[string]string{
 		"query": `mutation {
-			create_cart_product(
-				cart_id: "` + CartId + `"
-				product_id: "` + ProductId + `"
-				quantity: 3
-				size: "L"
-			){
+			create_cart_product(){
 				id, quantity, size,
 				product { id, name, price, stock, image_url, description }	
 			}
@@ -143,7 +136,7 @@ func TestUpdateCartProduct(t *testing.T) {
 			update_cart_product(
 				id: "` + CartProductId + `"
 				quantity: 2
-				size: "M"
+				size: M
 			){
 				id, quantity, size,
 				product { id, name, price, stock, image_url, description }	
@@ -164,7 +157,7 @@ func TestUpdateCartProduct(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	cartProduct, ok := data["create_cart_product"].(map[string]any)
+	cartProduct, ok := data["update_cart_product"].(map[string]any)
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, cartProduct["id"])

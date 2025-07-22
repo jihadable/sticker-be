@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/config"
@@ -72,7 +71,7 @@ func (r *mutationResolver) Register(ctx context.Context, name string, email stri
 		return nil, err
 	}
 
-	err = config.NotificationTrigger("new_notification_"+user.Id, mapper.NotificationMapper(notification))
+	err = config.NotificationTrigger("new_notification_"+user.Id, mapper.DBNotificationToGraphQLNotification(notification))
 	if err != nil {
 		return nil, err
 	}
@@ -446,7 +445,7 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID str
 		return nil, err
 	}
 
-	err = config.NotificationTrigger("new_notification_"+notifcationRecipientId, mapper.NotificationMapper(notification))
+	err = config.NotificationTrigger("new_notification_"+notifcationRecipientId, mapper.DBNotificationToGraphQLNotification(notification))
 	if err != nil {
 		return nil, err
 	}
@@ -456,12 +455,34 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID str
 
 // ReadNotification is the resolver for the read_notification field.
 func (r *mutationResolver) ReadNotification(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: ReadNotification - read_notification"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	_, err := validators.AuthValidator(authHeader, r.UserService)
+	if err != nil {
+		return false, err
+	}
+
+	err = r.NotificationService.ReadNotificationById(id)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // ReadAllNotifications is the resolver for the read_all_notifications field.
 func (r *mutationResolver) ReadAllNotifications(ctx context.Context) (bool, error) {
-	panic(fmt.Errorf("not implemented: ReadAllNotifications - read_all_notifications"))
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, r.UserService)
+	if err != nil {
+		return false, err
+	}
+
+	err = r.NotificationService.ReadAllNotificationsByRecipient(credit["user_id"])
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // GetUser is the resolver for the get_user field.
@@ -636,9 +657,25 @@ func (r *queryResolver) GetConversationByUser(ctx context.Context) (*model.Conve
 	return mapper.DBConversationTOGraphQLConversation(conversation), nil
 }
 
-// GetNotificationsByUser is the resolver for the get_notifications_by_user field.
-func (r *queryResolver) GetNotificationsByUser(ctx context.Context) ([]*model.Notification, error) {
-	panic(fmt.Errorf("not implemented: GetNotificationsByUser - get_notifications_by_user"))
+// GetNotificationsByRecipient is the resolver for the get_notifications_by_recipient field.
+func (r *queryResolver) GetNotificationsByRecipient(ctx context.Context) ([]*model.Notification, error) {
+	authHeader := ctx.Value(validators.AuthHeader).(string)
+	credit, err := validators.AuthValidator(authHeader, r.UserService)
+	if err != nil {
+		return nil, err
+	}
+
+	notifications, err := r.NotificationService.GetNotificationsByRecipient(credit["user_id"])
+	if err != nil {
+		return nil, err
+	}
+
+	notificationsResponse := make([]*model.Notification, len(notifications))
+	for i, notification := range notifications {
+		notificationsResponse[i] = mapper.DBNotificationToGraphQLNotification(notification)
+	}
+
+	return notificationsResponse, nil
 }
 
 // Mutation returns MutationResolver implementation.

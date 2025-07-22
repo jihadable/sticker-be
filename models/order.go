@@ -8,7 +8,7 @@ import (
 type Order struct {
 	Id         string `gorm:"column:id;primaryKey"`
 	CustomerId string `gorm:"column:customer_id"`
-	Status     string `gorm:"column:status"`
+	Status     string `gorm:"column:status;default:'Pending confirmation'"`
 	TotalPrice int    `gorm:"column:total_price"`
 
 	Customer *User     `gorm:"foreignKey:CustomerId;references:Id"`

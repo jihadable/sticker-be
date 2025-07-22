@@ -129,7 +129,6 @@ func (service *CustomProductServiceImpl) UpdateCustomProductById(id string, upda
 	}
 
 	cacheKeys := []string{"custom_product:" + customProduct.Id, "custom_product:customer:" + customProduct.CustomerId}
-
 	service.Redis.Del(context.Background(), cacheKeys...)
 
 	return service.GetCustomProductById(customProduct.Id)
@@ -145,7 +144,9 @@ func (service *CustomProductServiceImpl) DeleteCustomProductById(id string) erro
 	if err != nil {
 		return err
 	}
-	service.Redis.Del(context.Background(), "custom_product:"+id)
+
+	cacheKeys := []string{"custom_product:" + id, "custom_product:customer" + customProduct.CustomerId}
+	service.Redis.Del(context.Background(), cacheKeys...)
 
 	return nil
 }
