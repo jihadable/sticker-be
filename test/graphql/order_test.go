@@ -38,7 +38,7 @@ func TestPostOrderWithValidPayload(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -92,7 +92,7 @@ func TestPostOrderWithInvalidPayload(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -121,7 +121,7 @@ func TestGetOrdersByUser(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -178,7 +178,7 @@ func TestGetOrderWithValidId(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -233,7 +233,7 @@ func TestGetOrderWithInvalidId(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -262,7 +262,7 @@ func TestUpdateOrder(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)

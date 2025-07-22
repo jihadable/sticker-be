@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/config"
@@ -179,13 +180,14 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, 
 // CreateCustomProduct is the resolver for the create_custom_product field.
 func (r *mutationResolver) CreateCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
-	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
+	credit, err := validators.RoleValidator(authHeader, r.UserService, model.RoleCustomer.String())
 	if err != nil {
 		return nil, err
 	}
 
 	customProduct, err := r.CustomProductService.AddCustomProduct(&models.CustomProduct{
-		Name: name,
+		Name:       name,
+		CustomerId: credit["user_id"],
 	}, image)
 	if err != nil {
 		return nil, err
@@ -452,6 +454,16 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID str
 	return mapper.DBMessageToGraphQLMessage(newMessage), nil
 }
 
+// ReadNotification is the resolver for the read_notification field.
+func (r *mutationResolver) ReadNotification(ctx context.Context, id string) (bool, error) {
+	panic(fmt.Errorf("not implemented: ReadNotification - read_notification"))
+}
+
+// ReadAllNotifications is the resolver for the read_all_notifications field.
+func (r *mutationResolver) ReadAllNotifications(ctx context.Context) (bool, error) {
+	panic(fmt.Errorf("not implemented: ReadAllNotifications - read_all_notifications"))
+}
+
 // GetUser is the resolver for the get_user field.
 func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
@@ -622,6 +634,11 @@ func (r *queryResolver) GetConversationByUser(ctx context.Context) (*model.Conve
 	}
 
 	return mapper.DBConversationTOGraphQLConversation(conversation), nil
+}
+
+// GetNotificationsByUser is the resolver for the get_notifications_by_user field.
+func (r *queryResolver) GetNotificationsByUser(ctx context.Context) ([]*model.Notification, error) {
+	panic(fmt.Errorf("not implemented: GetNotificationsByUser - get_notifications_by_user"))
 }
 
 // Mutation returns MutationResolver implementation.

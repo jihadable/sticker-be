@@ -10,7 +10,13 @@ func DBCartProductToGraphQLCartProduct(cartProduct *models.CartProduct) *model.C
 		ID:       cartProduct.Id,
 		Quantity: int32(cartProduct.Quantity),
 		Size:     model.Size(cartProduct.Size),
-		Cart:     DBCartToGraphQLCart(cartProduct.Cart),
+		Cart: func() *model.Cart {
+			if cartProduct.Cart != nil {
+				return DBCartToGraphQLCart(cartProduct.Cart)
+			} else {
+				return nil
+			}
+		}(),
 		Product: func() *model.Product {
 			if cartProduct.Product != nil {
 				return DBProductToGraphQLProduct(cartProduct.Product)

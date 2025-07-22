@@ -2,7 +2,6 @@ package graphql
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http/httptest"
@@ -42,7 +41,6 @@ func TestCreateProductWithValidPayload1(t *testing.T) {
 
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", &requestBody)
 	request.Header.Set("Content-Type", writer.FormDataContentType())
-	fmt.Println(writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request, -1)
@@ -83,7 +81,7 @@ func TestCreateProductWithInvalidPayload(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -110,7 +108,7 @@ func TestGetProducts(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -120,10 +118,10 @@ func TestGetProducts(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	products, ok := data["get_products"].([]map[string]any)
+	products, ok := data["get_products"].([]any)
 	assert.True(t, ok)
 
-	product := products[0]
+	product := products[0].(map[string]any)
 	assert.NotEmpty(t, product["id"])
 	assert.NotEmpty(t, product["name"])
 	assert.NotEmpty(t, product["price"])
@@ -147,7 +145,7 @@ func TestGetProductWithValidId(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -183,7 +181,7 @@ func TestGetProductWithInvalidId(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -209,17 +207,15 @@ func TestUpdateProduct(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($id: ID!, $image: Upload!){ update_product(id: $id, name: \"update product test\", price: 1500, stock: 10, description: \"update desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
+		"query": "mutation($image: Upload!){ update_product(id: \"` + ProductId + `\", name: \"update product test\", price: 1500, stock: 10, description: \"update desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
 		"variables": {
-			"id": null,
 			"image": null
 		}
 	}`
 	_ = writer.WriteField("operations", operations)
-	_ = writer.WriteField("map", `{ "0": ["variables.id"], "1": ["variables.image"] }`)
-	_ = writer.WriteField("0", ProductId)
+	_ = writer.WriteField("map", `{ "0": ["variables.image"] }`)
 
-	part, err := writer.CreateFormFile("1", filepath.Base(filePath))
+	part, err := writer.CreateFormFile("0", filepath.Base(filePath))
 	assert.Nil(t, err)
 	_, err = io.Copy(part, file)
 	assert.Nil(t, err)
@@ -230,7 +226,7 @@ func TestUpdateProduct(t *testing.T) {
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -245,8 +241,8 @@ func TestUpdateProduct(t *testing.T) {
 
 	assert.Equal(t, ProductId, product["id"])
 	assert.Equal(t, "update product test", product["name"])
-	assert.Equal(t, 1500, product["price"])
-	assert.Equal(t, 10, product["stock"])
+	assert.Equal(t, float64(1500), product["price"])
+	assert.Equal(t, float64(10), product["stock"])
 	assert.NotEmpty(t, product["image_url"])
 	assert.Equal(t, "update desc test", product["description"])
 	assert.Empty(t, product["categories"])
@@ -261,8 +257,10 @@ func TestDeleteProduct(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -309,7 +307,7 @@ func TestCreateProductWithValidPayload2(t *testing.T) {
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -325,8 +323,8 @@ func TestCreateProductWithValidPayload2(t *testing.T) {
 	assert.NotEmpty(t, product["id"])
 	ProductId = product["id"].(string)
 	assert.Equal(t, "product test", product["name"])
-	assert.Equal(t, 1000, product["price"])
-	assert.Equal(t, 100, product["stock"])
+	assert.Equal(t, float64(1000), product["price"])
+	assert.Equal(t, float64(100), product["stock"])
 	assert.NotEmpty(t, product["image_url"])
 	assert.Equal(t, "desc test", product["description"])
 	assert.Empty(t, product["categories"])

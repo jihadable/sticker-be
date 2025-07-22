@@ -43,7 +43,7 @@ func TestCreateCustomProductWithValidPayload1(t *testing.T) {
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -87,7 +87,7 @@ func TestCreateCustomProductWithInvalidPayload(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -115,7 +115,7 @@ func TestGetCustomProductsByUser(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -125,10 +125,10 @@ func TestGetCustomProductsByUser(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	customProducts, ok := data["get_custom_products_by_customer"].([]map[string]any)
+	customProducts, ok := data["get_custom_products_by_customer"].([]any)
 	assert.True(t, ok)
 
-	customProduct := customProducts[0]
+	customProduct := customProducts[0].(map[string]any)
 	assert.NotEmpty(t, customProduct["id"])
 	assert.NotEmpty(t, customProduct["name"])
 	assert.NotEmpty(t, customProduct["image_url"])
@@ -159,7 +159,7 @@ func TestGetCustomProductWithValidId(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -202,7 +202,7 @@ func TestGetCustomProductWithInvalidId(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -228,17 +228,15 @@ func TestUpdateCustomProduct(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($id: ID!, $image: Upload!){ update_custom_product(id: $id, name: \"update custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
+		"query": "mutation($image: Upload!){ update_custom_product(id: \"` + CustomProductId + `\", name: \"update custom product test\", image: $image){ id, name, image_url, customer { id, name, email, role, phone, address } } }",
 		"variables": {
-			"id": null,
 			"image": null
 		}
 	}`
 	_ = writer.WriteField("operations", operations)
-	_ = writer.WriteField("map", `{ "0": ["variables.id"], "1": ["variables.image"] }`)
-	_ = writer.WriteField("0", ProductId)
+	_ = writer.WriteField("map", `{ "0": ["variables.image"] }`)
 
-	part, err := writer.CreateFormFile("1", filepath.Base(filePath))
+	part, err := writer.CreateFormFile("0", filepath.Base(filePath))
 	assert.Nil(t, err)
 	_, err = io.Copy(part, file)
 	assert.Nil(t, err)
@@ -249,7 +247,7 @@ func TestUpdateCustomProduct(t *testing.T) {
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -262,7 +260,7 @@ func TestUpdateCustomProduct(t *testing.T) {
 	customProduct, ok := data["update_custom_product"].(map[string]any)
 	assert.True(t, ok)
 
-	assert.Equal(t, ProductId, customProduct["id"])
+	assert.Equal(t, CustomProductId, customProduct["id"])
 	assert.Equal(t, "update custom product test", customProduct["name"])
 	assert.NotEmpty(t, customProduct["image_url"])
 
@@ -289,7 +287,7 @@ func TestDeleteCustomProduct(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -299,7 +297,7 @@ func TestDeleteCustomProduct(t *testing.T) {
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
 
-	deleteProduct, ok := data["delete_category"].(bool)
+	deleteProduct, ok := data["delete_custom_product"].(bool)
 	assert.True(t, ok)
 	assert.True(t, deleteProduct)
 
@@ -336,7 +334,7 @@ func TestCreateCustomProductWithValidPayload2(t *testing.T) {
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)

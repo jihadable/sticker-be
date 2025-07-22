@@ -12,9 +12,21 @@ func DBConversationTOGraphQLConversation(conversation *models.Conversation) *mod
 	}
 
 	return &model.Conversation{
-		ID:       conversation.Id,
-		Customer: DBUserToGraphQLUser(conversation.Customer),
-		Admin:    DBUserToGraphQLUser(conversation.Admin),
+		ID: conversation.Id,
+		Customer: func() *model.User {
+			if conversation.Customer != nil {
+				return DBUserToGraphQLUser(conversation.Customer)
+			} else {
+				return nil
+			}
+		}(),
+		Admin: func() *model.User {
+			if conversation.Admin != nil {
+				return DBUserToGraphQLUser(conversation.Admin)
+			} else {
+				return nil
+			}
+		}(),
 		Messages: messages,
 	}
 }

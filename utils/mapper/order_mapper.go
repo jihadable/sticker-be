@@ -15,7 +15,13 @@ func DBOrderToGraphQLOrder(order *models.Order) *model.Order {
 		ID:         order.Id,
 		Status:     order.Status,
 		TotalPrice: int32(order.TotalPrice),
-		Customer:   DBUserToGraphQLUser(order.Customer),
-		Products:   products,
+		Customer: func() *model.User {
+			if order.Customer != nil {
+				return DBUserToGraphQLUser(order.Customer)
+			} else {
+				return nil
+			}
+		}(),
+		Products: products,
 	}
 }

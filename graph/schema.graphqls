@@ -130,6 +130,17 @@ type Message {
 	sender: User!
 }
 
+type Notification {
+	id: ID!
+	type: String!
+	recipient_id: ID!
+	title: String!
+	message: String!
+	is_read: Boolean!
+
+	recipient: User!
+}
+
 type Auth {
 	token: String!
 	user: User!
@@ -168,6 +179,9 @@ type Query {
 
 	# conversation
 	get_conversation_by_user: Conversation
+
+	# notification
+	get_notifications_by_user: [Notification]!
 }
 
 type Mutation {
@@ -243,4 +257,8 @@ type Mutation {
 		custom_product_id: ID
 		message: String!
 	): Message!
+
+	# notification
+	read_notification(id: ID!): Boolean!
+	read_all_notifications: Boolean!
 }

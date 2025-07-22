@@ -11,7 +11,13 @@ func DBOrderProductToGraphQLOrderProduct(orderProduct *models.OrderProduct) *mod
 		Quantity:      int32(orderProduct.Quantity),
 		Size:          model.Size(orderProduct.Size),
 		SubtotalPrice: int32(orderProduct.SubtotalPrice),
-		Order:         DBOrderToGraphQLOrder(orderProduct.Order),
+		Order: func() *model.Order {
+			if orderProduct.Order != nil {
+				return DBOrderToGraphQLOrder(orderProduct.Order)
+			} else {
+				return nil
+			}
+		}(),
 		Product: func() *model.Product {
 			if orderProduct.Product != nil {
 				return DBProductToGraphQLProduct(orderProduct.Product)

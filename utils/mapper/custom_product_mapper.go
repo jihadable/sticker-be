@@ -10,6 +10,12 @@ func DBCustomProductToGraphQLCustomProduct(customProduct *models.CustomProduct) 
 		ID:       customProduct.Id,
 		Name:     customProduct.Name,
 		ImageURL: customProduct.ImageURL,
-		Customer: DBUserToGraphQLUser(customProduct.Customer),
+		Customer: func() *model.User {
+			if customProduct.Customer != nil {
+				return DBUserToGraphQLUser(customProduct.Customer)
+			} else {
+				return nil
+			}
+		}(),
 	}
 }

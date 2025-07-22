@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -15,7 +16,7 @@ func TestCreateCartProductWithProduct(t *testing.T) {
 				cart_id: "` + CartId + `"
 				product_id: "` + ProductId + `"
 				quantity: 3
-				size: "L"
+				size: L
 			){
 				id, quantity, size,
 				product { id, name, price, stock, image_url, description }	
@@ -23,13 +24,16 @@ func TestCreateCartProductWithProduct(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
+	fmt.Println(responseBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -39,7 +43,7 @@ func TestCreateCartProductWithProduct(t *testing.T) {
 
 	assert.NotEmpty(t, cartProduct["id"])
 	CartProductId = cartProduct["id"].(string)
-	assert.Equal(t, 3, cartProduct["quantity"])
+	assert.Equal(t, float64(3), cartProduct["quantity"])
 	assert.Equal(t, "L", cartProduct["size"])
 
 	product, ok := cartProduct["product"].(map[string]any)
@@ -70,8 +74,10 @@ func TestCreateCartProductWithCustomProduct(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -85,7 +91,7 @@ func TestCreateCartProductWithCustomProduct(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, cartProduct["id"])
-	assert.Equal(t, 1, cartProduct["quantity"])
+	assert.Equal(t, float64(1), cartProduct["quantity"])
 	assert.Equal(t, "XL", cartProduct["size"])
 
 	customProduct, ok := cartProduct["custom_product"].(map[string]any)
@@ -116,7 +122,7 @@ func TestCreateCartProductWithInvalidPayload(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -145,8 +151,10 @@ func TestUpdateCartProduct(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -160,7 +168,7 @@ func TestUpdateCartProduct(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotEmpty(t, cartProduct["id"])
-	assert.Equal(t, 2, cartProduct["quantity"])
+	assert.Equal(t, float64(2), cartProduct["quantity"])
 	assert.Equal(t, "M", cartProduct["size"])
 
 	product, ok := cartProduct["product"].(map[string]any)
@@ -183,8 +191,10 @@ func TestDeleteCartProduct(t *testing.T) {
 		}`,
 	})
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)

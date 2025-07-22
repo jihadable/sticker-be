@@ -13,6 +13,9 @@ import (
 type NotificationService interface {
 	AddNotification(notification *models.Notification) (*models.Notification, error)
 	GetNotificationById(id string) (*models.Notification, error)
+	GetNotificationsByUser(user_id string) ([]*models.Notification, error)
+	ReadNotificationById(id string) error
+	ReadAllNotificationsByUser(user_id string) error
 }
 
 type NotificationServiceImpl struct {
@@ -57,6 +60,18 @@ func (service *NotificationServiceImpl) GetNotificationById(id string) (*models.
 	service.Redis.Set(ctx, cacheKey, notificationJSON, 5*time.Minute)
 
 	return &notification, nil
+}
+
+func (service *NotificationServiceImpl) GetNotificationsByUser(user_id string) ([]*models.Notification, error) {
+	panic("")
+}
+
+func (service *NotificationServiceImpl) ReadNotificationById(id string) error {
+	panic("")
+}
+
+func (service *NotificationServiceImpl) ReadAllNotificationsByUser(user_id string) error {
+	panic("")
 }
 
 func NewNotificationService(db *gorm.DB, redis *redis.Client) NotificationService {

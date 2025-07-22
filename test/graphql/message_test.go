@@ -21,7 +21,7 @@ func TestCreateMessageWithoutReply(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -63,7 +63,7 @@ func TestCreateMessageWithInvalidPayload(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -91,7 +91,7 @@ func TestCreateMessageWithProductReply(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -143,7 +143,7 @@ func TestCreateMessageWithCustomProductReply(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)

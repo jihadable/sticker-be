@@ -27,7 +27,7 @@ func TestRegisterUserWithValidPayload(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -70,7 +70,7 @@ func TestPostUserWithInvalidPayload(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -95,7 +95,7 @@ func TestGetUserWithToken(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -127,7 +127,7 @@ func TestGetUserWithoutToken(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 
@@ -155,7 +155,7 @@ func TestUpdateUser(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -193,7 +193,7 @@ func TestLoginAsCustomer(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -239,7 +239,7 @@ func TestLoginAsAdmin(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
@@ -280,7 +280,7 @@ func TestLoginWithInvalidPayload(t *testing.T) {
 	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
 	request.Header.Set("Content-Type", "application/json")
 
-	response, err := App.Test(request)
+	response, err := App.Test(request, -1)
 
 	assert.Nil(t, err)
 

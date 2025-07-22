@@ -12,8 +12,14 @@ func DBCartToGraphQLCart(cart *models.Cart) *model.Cart {
 	}
 
 	return &model.Cart{
-		ID:       cart.Id,
-		Customer: DBUserToGraphQLUser(cart.Customer),
+		ID: cart.Id,
+		Customer: func() *model.User {
+			if cart.Customer != nil {
+				return DBUserToGraphQLUser(cart.Customer)
+			} else {
+				return nil
+			}
+		}(),
 		Products: products,
 	}
 }

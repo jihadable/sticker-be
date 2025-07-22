@@ -38,15 +38,6 @@ func (service *CustomProductServiceImpl) AddCustomProduct(customProduct *models.
 		return nil, err
 	}
 
-	ctx := context.Background()
-	service.Redis.Del(ctx, "custom_product:customer:"+customProduct.CustomerId)
-
-	customProductJSON, err := json.Marshal(customProduct)
-	if err != nil {
-		return nil, err
-	}
-	service.Redis.Set(ctx, "custom_product:"+customProduct.Id, customProductJSON, 30*time.Minute)
-
 	return service.GetCustomProductById(customProduct.Id)
 }
 

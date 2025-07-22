@@ -23,6 +23,12 @@ func DBMessageToGraphQLMessage(message *models.Message) *model.Message {
 				return nil
 			}
 		}(),
-		Sender: DBUserToGraphQLUser(message.Sender),
+		Sender: func() *model.User {
+			if message.Sender != nil {
+				return DBUserToGraphQLUser(message.Sender)
+			} else {
+				return nil
+			}
+		}(),
 	}
 }

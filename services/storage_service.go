@@ -22,8 +22,9 @@ type StorageServiceImpl struct {
 func (service *StorageServiceImpl) AddFile(file graphql.Upload) (*string, error) {
 	ext := filepath.Ext(file.Filename)
 	newFileName := uuid.NewString() + ext
+	contentType := getContentType(ext)
 
-	_, err := service.Storage.UploadFile(service.Bucket, newFileName, file.File, storage_go.FileOptions{ContentType: &file.ContentType})
+	_, err := service.Storage.UploadFile(service.Bucket, newFileName, file.File, storage_go.FileOptions{ContentType: &contentType})
 
 	if err != nil {
 		return nil, err
@@ -36,6 +37,19 @@ func (service *StorageServiceImpl) DeleteFile(fileName string) error {
 	_, err := service.Storage.RemoveFile(service.Bucket, []string{fileName})
 
 	return err
+}
+
+func getContentType(ext string) string {
+	switch ext {
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".gif":
+		return "image/gif"
+	default:
+		return "application/octet-stream"
+	}
 }
 
 func NewStorageService() StorageService {
