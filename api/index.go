@@ -1,14 +1,15 @@
-package main
+package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
-	"github.com/99designs/gqlgen/graphql/handler"
+	graphqlHandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jihadable/sticker-be/config"
 	"github.com/jihadable/sticker-be/graph"
@@ -17,10 +18,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	err := godotenv.Load(".env.local")
+// Handler is the main entry point of the application. Think of it like the main() method
+func Handler(w http.ResponseWriter, r *http.Request) {
+	// This is needed to set the proper request path in `*fiber.Ctx`
+	r.RequestURI = r.URL.String()
+
+	handler().ServeHTTP(w, r)
+}
+
+// building the fiber application
+func handler() http.HandlerFunc {
+	err := godotenv.Load(".env")
 	if err != nil {
-		panic("Failed to read .env file: " + err.Error())
+		fmt.Println("Warning: .env file not found")
 	}
 
 	app := fiber.New()
@@ -30,7 +40,7 @@ func main() {
 	redis := config.Redis()
 	pusher := config.NewPusher()
 
-	handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+	handler := graphqlHandler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		UserService:            services.NewUserService(db, redis),
 		ProductService:         services.NewProductService(db, redis),
 		CustomProductService:   services.NewCustomProductService(db, redis),
@@ -53,7 +63,7 @@ func main() {
 
 	app.All("/graphql", func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
-		ctx := context.WithValue(context.Background(), validators.AuthHeader, authHeader)
+		ctx := context.WithValue(c.Context(), validators.AuthHeader, authHeader)
 
 		return adaptor.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r = r.WithContext(ctx)
@@ -62,8 +72,8 @@ func main() {
 	})
 
 	app.Get("/docs", adaptor.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "docs/index.html")
+		http.ServeFile(w, r, "../docs/index.html")
 	})))
 
-	app.Listen(":3000")
+	return adaptor.FiberApp(app)
 }

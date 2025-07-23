@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphql Documentation</title>
+    <style>
+        body {
+            height: 100%;
+            margin: 0;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #voyager {
+            height: 100vh;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/graphql-voyager@2.1.0/dist/voyager.css"/>
+    <script src="https://unpkg.com/graphql-voyager@2.1.0/dist/voyager.standalone.js"></script>
+</head>
+<body>
+    <div id="voyager">Loading...</div>
+    <script type="module">
+        const { voyagerIntrospectionQuery: query } = GraphQLVoyager
+        const response = await fetch(
+            'http://localhost:3000/graphql',
+            {
+                method: 'post',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query }),
+                credentials: 'omit',
+            }
+        )
+        const introspection = await response.json()
+
+        // Render <Voyager /> into the body.
+        GraphQLVoyager.renderVoyager(document.getElementById('voyager'), {
+            introspection,
+        })
+    </script>
+</body>
+</html>

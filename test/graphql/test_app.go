@@ -29,26 +29,26 @@ func TestApp() *fiber.App {
 	redis := config.Redis()
 	pusher := config.NewPusher()
 
+	handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		UserService:            services.NewUserService(db, redis),
+		ProductService:         services.NewProductService(db, redis),
+		CustomProductService:   services.NewCustomProductService(db, redis),
+		CategoryService:        services.NewCategoryService(db, redis),
+		ProductCategoryService: services.NewProductCategoryService(db, redis),
+		CartService:            services.NewCartService(db, redis),
+		CartProductService:     services.NewCartProductService(db, redis),
+		OrderService:           services.NewOrderService(db, redis, services.NewOrderProductService(db, redis)),
+		ConversationService:    services.NewConversationService(db, redis),
+		MessageService:         services.NewMessageService(db, redis),
+		NotificationService:    services.NewNotificationService(db, redis),
+		Pusher:                 pusher,
+	}}))
+
+	handler.AddTransport(transport.POST{})
+	handler.AddTransport(transport.GET{})
+	handler.AddTransport(transport.MultipartForm{})
+
 	app.All("/graphql", func(c *fiber.Ctx) error {
-		handler := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-			UserService:            services.NewUserService(db, redis),
-			ProductService:         services.NewProductService(db, redis),
-			CustomProductService:   services.NewCustomProductService(db, redis),
-			CategoryService:        services.NewCategoryService(db, redis),
-			ProductCategoryService: services.NewProductCategoryService(db, redis),
-			CartService:            services.NewCartService(db, redis),
-			CartProductService:     services.NewCartProductService(db, redis),
-			OrderService:           services.NewOrderService(db, redis, services.NewOrderProductService(db, redis)),
-			ConversationService:    services.NewConversationService(db, redis),
-			MessageService:         services.NewMessageService(db, redis),
-			NotificationService:    services.NewNotificationService(db, redis),
-			Pusher:                 pusher,
-		}}))
-
-		handler.AddTransport(transport.POST{})
-		handler.AddTransport(transport.GET{})
-		handler.AddTransport(transport.MultipartForm{})
-
 		authHeader := c.Get("Authorization")
 		ctx := context.WithValue(c.Context(), validators.AuthHeader, authHeader)
 
