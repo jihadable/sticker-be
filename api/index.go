@@ -26,11 +26,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 // building the fiber application
 func handler() http.HandlerFunc {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	fmt.Println("Warning: .env file not found")
-	// }
-
 	app := fiber.New()
 	app.Use(cors.New(cors.ConfigDefault))
 
