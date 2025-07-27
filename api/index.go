@@ -72,7 +72,7 @@ func handler() http.HandlerFunc {
 	})
 
 	app.Get("/docs", adaptor.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../docs/index.html")
+		http.ServeFile(w, r, "docs/index.html")
 	})))
 
 	return adaptor.FiberApp(app)
