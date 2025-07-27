@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	graphqlHandler "github.com/99designs/gqlgen/graphql/handler"
@@ -15,7 +14,6 @@ import (
 	"github.com/jihadable/sticker-be/graph"
 	"github.com/jihadable/sticker-be/services"
 	"github.com/jihadable/sticker-be/validators"
-	"github.com/joho/godotenv"
 )
 
 // Handler is the main entry point of the application. Think of it like the main() method
@@ -28,10 +26,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 // building the fiber application
 func handler() http.HandlerFunc {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("Warning: .env file not found")
-	}
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	fmt.Println("Warning: .env file not found")
+	// }
 
 	app := fiber.New()
 	app.Use(cors.New(cors.ConfigDefault))
