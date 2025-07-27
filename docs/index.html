@@ -21,10 +21,16 @@
 </head>
 <body>
     <div id="voyager">Loading...</div>
+    <script>
+        window.env = {
+            LOCAL_URL: "http://localhost:3000/graphql",
+            PROD_URL: "https://sticker-be.vercel.app/graphql"
+        }
+    </script>
     <script type="module">
         const { voyagerIntrospectionQuery: query } = GraphQLVoyager
         const response = await fetch(
-            'http://localhost:3000/graphql',
+            window.env.PROD_URL,
             {
                 method: 'post',
                 headers: {
