@@ -12,6 +12,7 @@ import (
 type StorageService interface {
 	AddFile(file graphql.Upload) (*string, error)
 	DeleteFile(fileName string) error
+	GetPublicFileURL(filePath string) (string, error)
 }
 
 type StorageServiceImpl struct {
@@ -37,6 +38,12 @@ func (service *StorageServiceImpl) DeleteFile(fileName string) error {
 	_, err := service.Storage.RemoveFile(service.Bucket, []string{fileName})
 
 	return err
+}
+
+func (service *StorageServiceImpl) GetPublicFileURL(filePath string) (string, error) {
+	publicURL := service.Storage.GetPublicUrl(service.Bucket, filePath)
+
+	return publicURL.SignedURL, nil
 }
 
 func getContentType(ext string) string {
