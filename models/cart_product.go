@@ -13,9 +13,9 @@ type CartProduct struct {
 	Quantity        int     `gorm:"column:quantity"`
 	Size            string  `gorm:"column:size"`
 
-	Cart          *Cart          `gorm:"foreignKey:CartId;references:Id"`
-	Product       *Product       `gorm:"foreignKey:ProductId;references:Id"`
-	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id"`
+	Cart          *Cart          `gorm:"foreignKey:CartId;references:Id;constraint:OnDelete:CASCADE"`
+	Product       *Product       `gorm:"foreignKey:ProductId;references:Id;constraint:OnDelete:SET NULL"`
+	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id;constraint:OnDelete:SET NULL"`
 }
 
 func (model *CartProduct) BeforeCreate(tx *gorm.DB) error {

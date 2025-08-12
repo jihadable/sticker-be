@@ -1,8 +1,13 @@
 package graphql
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,15 +15,43 @@ import (
 )
 
 func TestCreateCategoryWithValidPayload1(t *testing.T) {
-	requestBody := RequestBodyParser(map[string]string{
-		"query": `mutation {
-			create_category(id: "test category"){
-				id, products { id, name, price, stock, image_url, description }
-			}
-		}`,
-	})
-	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
-	request.Header.Set("Content-Type", "application/json")
+	// requestBody := RequestBodyParser(map[string]string{
+	// 	"query": `mutation {
+	// 		create_category(id: "test category"){
+	// 			id, products { id, name, price, stock, image_url, description }
+	// 		}
+	// 	}`,
+	// })
+	// request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	// request.Header.Set("Content-Type", "application/json")
+	// request.Header.Set("Authorization", "Bearer "+AdminJWT)
+	filePath := filepath.Join("..", "..", "static", "redis.png")
+	file, err := os.Open(filePath)
+	assert.Nil(t, err)
+	defer file.Close()
+
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	operations := `
+	{
+		"query": "mutation($image: Upload!){ create_category(id: \"test category\", image: $image){ id, image_url, products { id, name, price, stock, image_url, description } } }",
+		"variables": {
+			"image": null
+		}
+	}`
+	_ = writer.WriteField("operations", operations)
+	_ = writer.WriteField("map", `{ "0": ["variables.image"] }`)
+
+	part, err := writer.CreateFormFile("0", filepath.Base(filePath))
+	assert.Nil(t, err)
+	_, err = io.Copy(part, file)
+	assert.Nil(t, err)
+
+	writer.Close()
+
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", &requestBody)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request, -1)
@@ -35,6 +68,7 @@ func TestCreateCategoryWithValidPayload1(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, "test category", category["id"])
+	assert.NotEmpty(t, category["image_url"])
 	CategoryId = category["id"].(string)
 	assert.Empty(t, category["products"])
 
@@ -94,6 +128,7 @@ func TestGetCategories(t *testing.T) {
 
 	category := categories[0].(map[string]any)
 	assert.NotEmpty(t, category["id"])
+	assert.NotEmpty(t, category["image_url"])
 	assert.Empty(t, category["products"])
 
 	fmt.Println("TestGetCategories: ✅")
@@ -124,6 +159,7 @@ func TestGetCategoryWithValidId(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, CategoryId, category["id"])
+	assert.NotEmpty(t, category["image_url"])
 	assert.Empty(t, category["products"])
 
 	fmt.Println("TestGetCategoryWithValidId: ✅")
@@ -183,15 +219,43 @@ func TestDeleteCategory(t *testing.T) {
 }
 
 func TestCreateCategoryWithValidPayload2(t *testing.T) {
-	requestBody := RequestBodyParser(map[string]string{
-		"query": `mutation {
-			create_category(id: "test category"){
-				id, products { id, name, price, stock, image_url, description }
-			}
-		}`,
-	})
-	request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
-	request.Header.Set("Content-Type", "application/json")
+	// requestBody := RequestBodyParser(map[string]string{
+	// 	"query": `mutation {
+	// 		create_category(id: "test category"){
+	// 			id, products { id, name, price, stock, image_url, description }
+	// 		}
+	// 	}`,
+	// })
+	// request := httptest.NewRequest(fiber.MethodPost, "/graphql", requestBody)
+	// request.Header.Set("Content-Type", "application/json")
+	// request.Header.Set("Authorization", "Bearer "+AdminJWT)
+	filePath := filepath.Join("..", "..", "static", "redis.png")
+	file, err := os.Open(filePath)
+	assert.Nil(t, err)
+	defer file.Close()
+
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	operations := `
+	{
+		"query": "mutation($image: Upload!){ create_category(id: \"test category\", image: $image){ id, image_url, products { id, name, price, stock, image_url, description } } }",
+		"variables": {
+			"image": null
+		}
+	}`
+	_ = writer.WriteField("operations", operations)
+	_ = writer.WriteField("map", `{ "0": ["variables.image"] }`)
+
+	part, err := writer.CreateFormFile("0", filepath.Base(filePath))
+	assert.Nil(t, err)
+	_, err = io.Copy(part, file)
+	assert.Nil(t, err)
+
+	writer.Close()
+
+	request := httptest.NewRequest(fiber.MethodPost, "/graphql", &requestBody)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
 	request.Header.Set("Authorization", "Bearer "+AdminJWT)
 
 	response, err := App.Test(request, -1)
@@ -208,6 +272,7 @@ func TestCreateCategoryWithValidPayload2(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, "test category", postCategory["id"])
+	assert.NotEmpty(t, postCategory["image_url"])
 	CategoryId = postCategory["id"].(string)
 	assert.Empty(t, postCategory["products"])
 

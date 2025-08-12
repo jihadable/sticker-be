@@ -11,7 +11,7 @@ type CustomProduct struct {
 	CustomerId string `gorm:"column:customer_id"`
 	ImageURL   string `gorm:"column:image_url"`
 
-	Customer *User `gorm:"foreignKey:CustomerId;references:Id"`
+	Customer *User `gorm:"foreignKey:CustomerId;references:Id;constraint:OnDelete:CASCADE"`
 }
 
 func (model *CustomProduct) BeforeCreate(tx *gorm.DB) error {

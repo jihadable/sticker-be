@@ -25,7 +25,7 @@ func TestCreateProductWithValidPayload1(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ create_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
+		"query": "mutation($image: Upload!){ create_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id, image_url } } }",
 		"variables": {
 			"image": null
 		}
@@ -74,7 +74,7 @@ func TestCreateProductWithInvalidPayload(t *testing.T) {
 		"query": `mutation {
 			create_product(){
 				id, name, price, stock, image_url, description,
-				categories { id }
+				categories { id, image_url }
 			}	
 		}`,
 	})
@@ -102,7 +102,7 @@ func TestGetProducts(t *testing.T) {
 		"query": `query {
 			get_products {
 				id, name, price, stock, image_url, description, 
-				categories { id }
+				categories { id, image_url }
 			}	
 		}`,
 	})
@@ -139,7 +139,7 @@ func TestGetProductWithValidId(t *testing.T) {
 		"query": `query {
 			get_product(id: "` + ProductId + `"){
 				id, name, price, stock, image_url, description,
-				categories { id }
+				categories { id, image_url }
 			}
 		}`,
 	})
@@ -175,7 +175,7 @@ func TestGetProductWithInvalidId(t *testing.T) {
 		"query": `query {
 			get_product(id: "xxx"){
 				id, name, price, stock, image_url, description,
-				categories { id }
+				categories { id, image_url }
 			}
 		}`,
 	})
@@ -208,7 +208,7 @@ func TestUpdateProduct(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ update_product(id: \"` + ProductId + `\", name: \"update product test\", price: 1500, stock: 10, description: \"update desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
+		"query": "mutation($image: Upload!){ update_product(id: \"` + ProductId + `\", name: \"update product test\", price: 1500, stock: 10, description: \"update desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id, image_url } } }",
 		"variables": {
 			"image": null
 		}
@@ -233,6 +233,7 @@ func TestUpdateProduct(t *testing.T) {
 	assert.Equal(t, fiber.StatusOK, response.StatusCode)
 
 	responseBody := ResponseBodyParser(response.Body)
+	fmt.Println(requestBody)
 
 	data, ok := responseBody["data"].(map[string]any)
 	assert.True(t, ok)
@@ -289,7 +290,7 @@ func TestCreateProductWithValidPayload2(t *testing.T) {
 
 	operations := `
 	{
-		"query": "mutation($image: Upload!){ create_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id } } }",
+		"query": "mutation($image: Upload!){ create_product(name: \"product test\", price: 1000, stock: 100, description: \"desc test\", image: $image){ id, name, price, stock, image_url, description, categories { id, image_url } } }",
 		"variables": {
 			"image": null
 		}

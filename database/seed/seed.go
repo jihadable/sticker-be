@@ -59,7 +59,7 @@ func userSeeder(db *gorm.DB) error {
 }
 
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load(".env.local")
 	if err != nil {
 		panic("Failed to read .env file: " + err.Error())
 	}

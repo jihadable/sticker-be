@@ -69,6 +69,7 @@ type ComplexityRoot struct {
 
 	Category struct {
 		ID       func(childComplexity int) int
+		ImageURL func(childComplexity int) int
 		Products func(childComplexity int) int
 	}
 
@@ -96,7 +97,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateCartProduct     func(childComplexity int, cartID string, productID *string, customProductID *string, quantity int32, size model.Size) int
-		CreateCategory        func(childComplexity int, id string) int
+		CreateCategory        func(childComplexity int, id string, image graphql.Upload) int
 		CreateCustomProduct   func(childComplexity int, name string, image graphql.Upload) int
 		CreateMessage         func(childComplexity int, conversationID string, productID *string, customProductID *string, message string) int
 		CreateOrder           func(childComplexity int, orderItems []*model.OrderItem, totalPrice int32) int
@@ -197,7 +198,7 @@ type MutationResolver interface {
 	CreateCustomProduct(ctx context.Context, name string, image graphql.Upload) (*model.CustomProduct, error)
 	UpdateCustomProduct(ctx context.Context, id string, name string, image *graphql.Upload) (*model.CustomProduct, error)
 	DeleteCustomProduct(ctx context.Context, id string) (bool, error)
-	CreateCategory(ctx context.Context, id string) (*model.Category, error)
+	CreateCategory(ctx context.Context, id string, image graphql.Upload) (*model.Category, error)
 	DeleteCategory(ctx context.Context, id string) (bool, error)
 	CreateProductCategory(ctx context.Context, productID string, categoryID string) (*model.ProductCategory, error)
 	DeleteProductCategory(ctx context.Context, productID string, categoryID string) (bool, error)
@@ -328,6 +329,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Category.ID(childComplexity), true
 
+	case "Category.image_url":
+		if e.complexity.Category.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.Category.ImageURL(childComplexity), true
+
 	case "Category.products":
 		if e.complexity.Category.Products == nil {
 			break
@@ -448,7 +456,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateCategory(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.CreateCategory(childComplexity, args["id"].(string), args["image"].(graphql.Upload)), true
 
 	case "Mutation.create_custom_product":
 		if e.complexity.Mutation.CreateCustomProduct == nil {
@@ -1250,6 +1258,11 @@ func (ec *executionContext) field_Mutation_create_category_args(ctx context.Cont
 		return nil, err
 	}
 	args["id"] = arg0
+	arg1, err := ec.field_Mutation_create_category_argsImage(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["image"] = arg1
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_create_category_argsID(
@@ -1262,6 +1275,19 @@ func (ec *executionContext) field_Mutation_create_category_argsID(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_create_category_argsImage(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+	if tmp, ok := rawArgs["image"]; ok {
+		return ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal graphql.Upload
 	return zeroVal, nil
 }
 
@@ -2988,6 +3014,50 @@ func (ec *executionContext) fieldContext_Category_id(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Category_image_url(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Category_image_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Category_image_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Category",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Category_products(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Category_products(ctx, field)
 	if err != nil {
@@ -4315,7 +4385,7 @@ func (ec *executionContext) _Mutation_create_category(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["id"].(string), fc.Args["image"].(graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4342,6 +4412,8 @@ func (ec *executionContext) fieldContext_Mutation_create_category(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Category_id(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Category_image_url(ctx, field)
 			case "products":
 				return ec.fieldContext_Category_products(ctx, field)
 			}
@@ -6207,6 +6279,8 @@ func (ec *executionContext) fieldContext_Product_categories(_ context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Category_id(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Category_image_url(ctx, field)
 			case "products":
 				return ec.fieldContext_Category_products(ctx, field)
 			}
@@ -6317,6 +6391,8 @@ func (ec *executionContext) fieldContext_ProductCategory_category(_ context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Category_id(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Category_image_url(ctx, field)
 			case "products":
 				return ec.fieldContext_Category_products(ctx, field)
 			}
@@ -6679,6 +6755,8 @@ func (ec *executionContext) fieldContext_Query_get_category(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Category_id(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Category_image_url(ctx, field)
 			case "products":
 				return ec.fieldContext_Category_products(ctx, field)
 			}
@@ -6740,6 +6818,8 @@ func (ec *executionContext) fieldContext_Query_get_categories(_ context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Category_id(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Category_image_url(ctx, field)
 			case "products":
 				return ec.fieldContext_Category_products(ctx, field)
 			}
@@ -9710,6 +9790,11 @@ func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = graphql.MarshalString("Category")
 		case "id":
 			out.Values[i] = ec._Category_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "image_url":
+			out.Values[i] = ec._Category_image_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

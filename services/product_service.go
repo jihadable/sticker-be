@@ -20,9 +20,9 @@ type ProductService interface {
 }
 
 type ProductServiceImpl struct {
-	DB             *gorm.DB
-	Redis          *redis.Client
-	StorageService StorageService
+	DB    *gorm.DB
+	Redis *redis.Client
+	StorageService
 }
 
 func (service *ProductServiceImpl) AddProduct(product *models.Product, image graphql.Upload) (*models.Product, error) {
@@ -30,7 +30,6 @@ func (service *ProductServiceImpl) AddProduct(product *models.Product, image gra
 	if err != nil {
 		return nil, err
 	}
-
 	product.ImageURL = *imageURL
 
 	err = service.DB.Create(product).Error
@@ -127,6 +126,11 @@ func (service *ProductServiceImpl) DeleteProductById(id string) error {
 		return err
 	}
 
+	err = service.StorageService.DeleteFile(product.ImageURL)
+	if err != nil {
+		return err
+	}
+
 	err = service.DB.Delete(product).Error
 	if err != nil {
 		return err
@@ -136,6 +140,6 @@ func (service *ProductServiceImpl) DeleteProductById(id string) error {
 	return nil
 }
 
-func NewProductService(db *gorm.DB, redis *redis.Client) ProductService {
-	return &ProductServiceImpl{DB: db, Redis: redis, StorageService: NewStorageService()}
+func NewProductService(db *gorm.DB, redis *redis.Client, storageService StorageService) ProductService {
+	return &ProductServiceImpl{DB: db, Redis: redis, StorageService: storageService}
 }

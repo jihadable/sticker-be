@@ -14,7 +14,7 @@ func TestCreateProductCategoryWithValidPayload(t *testing.T) {
 		"query": `mutation {
 			create_product_category(product_id: "` + ProductId + `", category_id: "` + CategoryId + `"){
 				product { id, name, price, stock, image_url, description },
-				category { id }
+				category { id, image_url }
 			}
 		}`,
 	})
@@ -58,7 +58,7 @@ func TestCreateProductCategoryWithInvalidPayload(t *testing.T) {
 		"query": `mutation {
 			create_product_category(){
 				product { id, name, price, stock, image_url, description },
-				category { id }
+				category { id, image_url }
 			}
 		}`,
 	})

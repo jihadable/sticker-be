@@ -9,7 +9,7 @@ type Cart struct {
 	Id         string `gorm:"column:id;primaryKey"`
 	CustomerId string `gorm:"column:customer_id"`
 
-	Customer *User     `gorm:"foreignKey:CustomerId;references:Id"`
+	Customer *User     `gorm:"foreignKey:CustomerId;references:Id;constraint:OnDelete:CASCADE"`
 	Products []Product `gorm:"many2many:cart_products;joinForeignKey:CartId;joinReferences:ProductId"`
 }
 

@@ -140,6 +140,11 @@ func (service *CustomProductServiceImpl) DeleteCustomProductById(id string) erro
 		return err
 	}
 
+	err = service.StorageService.DeleteFile(customProduct.ImageURL)
+	if err != nil {
+		return err
+	}
+
 	err = service.DB.Delete(customProduct).Error
 	if err != nil {
 		return err
@@ -151,6 +156,6 @@ func (service *CustomProductServiceImpl) DeleteCustomProductById(id string) erro
 	return nil
 }
 
-func NewCustomProductService(db *gorm.DB, redis *redis.Client) CustomProductService {
-	return &CustomProductServiceImpl{DB: db, Redis: redis, StorageService: NewStorageService()}
+func NewCustomProductService(db *gorm.DB, redis *redis.Client, storageService StorageService) CustomProductService {
+	return &CustomProductServiceImpl{DB: db, Redis: redis, StorageService: storageService}
 }

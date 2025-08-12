@@ -31,6 +31,7 @@ type CartProduct struct {
 
 type Category struct {
 	ID       string     `json:"id"`
+	ImageURL string     `json:"image_url"`
 	Products []*Product `json:"products"`
 }
 

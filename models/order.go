@@ -11,7 +11,7 @@ type Order struct {
 	Status     string `gorm:"column:status;default:'Pending confirmation'"`
 	TotalPrice int    `gorm:"column:total_price"`
 
-	Customer *User     `gorm:"foreignKey:CustomerId;references:Id"`
+	Customer *User     `gorm:"foreignKey:CustomerId;references:Id;constraint:OnDelete:SET NULL"`
 	Products []Product `gorm:"many2many:order_products;joinForeignKey:OrderId;joinReferences:ProductId"`
 }
 

@@ -13,7 +13,7 @@ type Notification struct {
 	Message     string `gorm:"column:message" json:"message"`
 	IsRead      bool   `gorm:"column:is_read;default:false" json:"is_read"`
 
-	Recipient *User `gorm:"foreignKey:RecipientId;references:Id"`
+	Recipient *User `gorm:"foreignKey:RecipientId;references:Id;constraint:OnDelete:CASCADE"`
 }
 
 func (model *Notification) BeforeCreate(tx *gorm.DB) error {

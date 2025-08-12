@@ -13,9 +13,9 @@ type Message struct {
 	SenderId        string  `gorm:"column:sender_id"`
 	Message         string  `gorm:"column:message"`
 
-	Product       *Product       `gorm:"foreignKey:ProductId;references:Id"`
-	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id"`
-	Sender        *User          `gorm:"foreignKey:SenderId;references:Id"`
+	Product       *Product       `gorm:"foreignKey:ProductId;references:Id;constraint:OnDelete:SET NULL"`
+	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id;constraint:OnDelete:SET NULL"`
+	Sender        *User          `gorm:"foreignKey:SenderId;references:Id;constraint:OnDelete:CASCADE"`
 }
 
 func (model *Message) BeforeCreate(tx *gorm.DB) error {

@@ -10,8 +10,8 @@ type Conversation struct {
 	CustomerId string `gorm:"column:customer_id"`
 	AdminId    string `gorm:"column:admin_id"`
 
-	Customer *User     `gorm:"foreignKey:CustomerId;references:Id"`
-	Admin    *User     `gorm:"foreignKey:AdminId;references:Id"`
+	Customer *User     `gorm:"foreignKey:CustomerId;references:Id;constraint:OnDelete:CASCADE"`
+	Admin    *User     `gorm:"foreignKey:AdminId;references:Id;constraint:OnDelete:CASCADE"`
 	Messages []Message `gorm:"foreignKey:ConversationId;references:Id"`
 }
 

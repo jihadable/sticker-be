@@ -14,9 +14,9 @@ type OrderProduct struct {
 	Size            string  `gorm:"column:size"`
 	SubtotalPrice   int     `gorm:"column:subtotal_price"`
 
-	Order         *Order         `gorm:"foreignKey:OrderId;references:Id"`
-	Product       *Product       `gorm:"foreignKey:ProductId;references:Id"`
-	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id"`
+	Order         *Order         `gorm:"foreignKey:OrderId;references:Id;constraint:OnDelete:CASCADE"`
+	Product       *Product       `gorm:"foreignKey:ProductId;references:Id;constraint:OnDelete:SET NULL"`
+	CustomProduct *CustomProduct `gorm:"foreignKey:CustomProductId;references:Id;constraint:OnDelete:SET NULL"`
 }
 
 func (model *OrderProduct) BeforeCreate(tx *gorm.DB) error {

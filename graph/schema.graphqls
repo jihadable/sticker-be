@@ -49,6 +49,7 @@ type CustomProduct {
 
 type Category {
 	id: ID!
+	image_url: String!
 
 	products: [Product]!
 }
@@ -224,7 +225,7 @@ type Mutation {
 	delete_custom_product(id: ID!): Boolean!
 
 	# category
-	create_category(id: ID!): Category!
+	create_category(id: ID!, image: Upload!): Category!
 	delete_category(id: ID!): Boolean!
 
 	# product_category

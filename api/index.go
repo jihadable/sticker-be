@@ -32,12 +32,13 @@ func handler() http.HandlerFunc {
 	db := config.DB()
 	redis := config.Redis()
 	pusher := config.NewPusher()
+	storageService := services.NewStorageService()
 
 	handler := graphqlHandler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		UserService:            services.NewUserService(db, redis),
-		ProductService:         services.NewProductService(db, redis),
-		CustomProductService:   services.NewCustomProductService(db, redis),
-		CategoryService:        services.NewCategoryService(db, redis),
+		ProductService:         services.NewProductService(db, redis, storageService),
+		CustomProductService:   services.NewCustomProductService(db, redis, storageService),
+		CategoryService:        services.NewCategoryService(db, redis, storageService),
 		ProductCategoryService: services.NewProductCategoryService(db, redis),
 		CartService:            services.NewCartService(db, redis),
 		CartProductService:     services.NewCartProductService(db, redis),

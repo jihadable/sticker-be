@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/jihadable/sticker-be/models"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type CategoryService interface {
-	AddCategory(category *models.Category) (*models.Category, error)
+	AddCategory(category *models.Category, image graphql.Upload) (*models.Category, error)
 	GetCategoryById(id string) (*models.Category, error)
 	GetCategories() ([]*models.Category, error)
 	DeleteCategoryById(id string) error
@@ -20,10 +21,17 @@ type CategoryService interface {
 type CategoryServiceImpl struct {
 	DB    *gorm.DB
 	Redis *redis.Client
+	StorageService
 }
 
-func (service *CategoryServiceImpl) AddCategory(category *models.Category) (*models.Category, error) {
-	err := service.DB.Create(category).Error
+func (service *CategoryServiceImpl) AddCategory(category *models.Category, image graphql.Upload) (*models.Category, error) {
+	imageURL, err := service.StorageService.AddFile(image)
+	if err != nil {
+		return nil, err
+	}
+	category.ImageURL = *imageURL
+
+	err = service.DB.Create(category).Error
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +104,11 @@ func (service *CategoryServiceImpl) DeleteCategoryById(id string) error {
 		return err
 	}
 
+	err = service.StorageService.DeleteFile(category.ImageURL)
+	if err != nil {
+		return err
+	}
+
 	err = service.DB.Delete(&category).Error
 	if err != nil {
 		return err
@@ -107,6 +120,6 @@ func (service *CategoryServiceImpl) DeleteCategoryById(id string) error {
 	return nil
 }
 
-func NewCategoryService(db *gorm.DB, redis *redis.Client) CategoryService {
-	return &CategoryServiceImpl{DB: db, Redis: redis}
+func NewCategoryService(db *gorm.DB, redis *redis.Client, storageService StorageService) CategoryService {
+	return &CategoryServiceImpl{DB: db, Redis: redis, StorageService: storageService}
 }

@@ -229,14 +229,14 @@ func (r *mutationResolver) DeleteCustomProduct(ctx context.Context, id string) (
 }
 
 // CreateCategory is the resolver for the create_category field.
-func (r *mutationResolver) CreateCategory(ctx context.Context, id string) (*model.Category, error) {
+func (r *mutationResolver) CreateCategory(ctx context.Context, id string, image graphql.Upload) (*model.Category, error) {
 	authHeader := ctx.Value(validators.AuthHeader).(string)
 	_, err := validators.RoleValidator(authHeader, r.UserService, model.RoleAdmin.String())
 	if err != nil {
 		return nil, err
 	}
 
-	category, err := r.CategoryService.AddCategory(&models.Category{Id: id})
+	category, err := r.CategoryService.AddCategory(&models.Category{Id: id}, image)
 	if err != nil {
 		return nil, err
 	}
